@@ -63,6 +63,45 @@ db.serialize(() => {
       console.log('Medical records table created successfully');
     }
   });
+
+  // Insert data into Users table
+  db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, ['john_doe', 'password123'], function(err) {
+    if (err) {
+      console.error('Error inserting into users:', err.message);
+    } else {
+      console.log(`Inserted user with ID ${this.lastID}`);
+    }
+  });
+
+  // Insert data into Pets table
+  db.run(`INSERT INTO pets (user_id, name, species, breed, feeding_schedule, medical_history, care_needs) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [1, 'Buddy', 'Dog', 'Golden Retriever', 'Morning and Evening', 'None', 'Daily walks, loves to play fetch'], function(err) {
+      if (err) {
+        console.error('Error inserting into pets:', err.message);
+      } else {
+        console.log(`Inserted pet with ID ${this.lastID}`);
+      }
+    });
+
+  // Insert data into Schedules table
+  db.run(`INSERT INTO schedules (pet_id, feeding_time, grooming_time, vet_visit) VALUES (?, ?, ?, ?)`,
+    [1, '08:00', '10:00', '2024-12-01'], function(err) {
+      if (err) {
+        console.error('Error inserting into schedules:', err.message);
+      } else {
+        console.log(`Inserted schedule with ID ${this.lastID}`);
+      }
+    });
+
+  // Insert data into Medical Records table
+  db.run(`INSERT INTO medical_records (pet_id, record) VALUES (?, ?)`,
+    [1, 'Routine check-up: Healthy, all vaccinations up to date.'], function(err) {
+      if (err) {
+        console.error('Error inserting into medical records:', err.message);
+      } else {
+        console.log(`Inserted medical record with ID ${this.lastID}`);
+      }
+    });
 });
 
 db.close();

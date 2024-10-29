@@ -1,5 +1,5 @@
 import React from 'react';
-import JobsList from './components/PetsList';
+import PetsList from './components/PetsList';
 
 function App() {
     return (
