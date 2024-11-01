@@ -16,78 +16,12 @@ const db = new sqlite3.Database('./mydb.sqlite', (err) => {
     console.log('Connected to the SQLite database.');
   }
 });
-
-// Create tables if they don't exist
-db.serialize(() => {
-  // Create Users table
-  db.run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE,
-    password TEXT
-  )`, (err) => {
-    if (err) {
-      console.error('Error creating users table:', err.message);
-    } else {
-      console.log('Users table created successfully');
-    }
-  });
-
-  // Create Pets table
-  db.run(`CREATE TABLE IF NOT EXISTS pets (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    name TEXT,
-    species TEXT,
-    breed TEXT,
-    feeding_schedule TEXT,
-    medical_history TEXT,
-    care_needs TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )`, (err) => {
-    if (err) {
-      console.error('Error creating pets table:', err.message);
-    } else {
-      console.log('Pets table created successfully');
-    }
-  });
-
-  // Create Schedules table
-  db.run(`CREATE TABLE IF NOT EXISTS schedules (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pet_id INTEGER,
-    feeding_time TEXT,
-    grooming_time TEXT,
-    vet_visit TEXT,
-    FOREIGN KEY (pet_id) REFERENCES pets(id)
-  )`, (err) => {
-    if (err) {
-      console.error('Error creating schedules table:', err.message);
-    } else {
-      console.log('Schedules table created successfully');
-    }
-  });
-
-  // Create Medical Records table
-  db.run(`CREATE TABLE IF NOT EXISTS medical_records (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pet_id INTEGER,
-    record TEXT,
-    FOREIGN KEY (pet_id) REFERENCES pets(id)
-  )`, (err) => {
-    if (err) {
-      console.error('Error creating medical records table:', err.message);
-    } else {
-      console.log('Medical records table created successfully');
-    }
-  });
-});
-
 // CRUD operations for Users
 app.post('/api/users', (req, res) => {
   const { username, password } = req.body;
   db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, [username, password], function (err) {
     if (err) {
-      res.status(400).json({ error: err.message });
+      res.status(404).json({ error: err.message });
       return;
     }
     res.status(201).json({ id: this.lastID });
@@ -97,54 +31,169 @@ app.post('/api/users', (req, res) => {
 app.get('/api/users', (req, res) => {
   db.all(`SELECT * FROM users`, [], (err, rows) => {
     if (err) {
-      res.status(400).json({ error: err.message });
+      res.status(404).json({ error: err.message });
       return;
     }
     res.json({ data: rows });
+  });
+});
+
+// Get a user by ID
+app.get('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  db.get(`SELECT * FROM users WHERE id = ?`, [id], (err, row) => {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
+});
+
+// Update a user by ID
+app.put('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  const { username, password } = req.body;
+  db.run(`UPDATE users SET username = ?, password = ? WHERE id = ?`, [username, password, id], function (err) {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ updatedID: id });
+  });
+});
+
+// Delete a user by ID
+app.delete('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  db.run(`DELETE FROM users WHERE id = ?`, [id], function (err) {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ deletedID: id });
   });
 });
 
 // CRUD operations for Pets
 app.post('/api/pets', (req, res) => {
   const { user_id, name, species, breed, feeding_schedule, medical_history, care_needs } = req.body;
-  db.run(`INSERT INTO pets (user_id, name, species, breed, feeding_schedule, medical_history, care_needs) VALUES (?, ?, ?, ?, ?, ?, ?)`, [user_id, name, species, breed, feeding_schedule, medical_history, care_needs], function (err) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID });
-  });
+  db.run(`INSERT INTO pets (user_id, name, species, breed, feeding_schedule, medical_history, care_needs) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
+    [user_id, name, species, breed, feeding_schedule, medical_history, care_needs], function (err) {
+      if (err) {
+        res.status(404).json({ error: err.message });
+        return;
+      }
+      res.status(201).json({ id: this.lastID });
+    });
 });
 
 app.get('/api/pets', (req, res) => {
   db.all(`SELECT * FROM pets`, [], (err, rows) => {
     if (err) {
-      res.status(400).json({ error: err.message });
+      res.status(404).json({ error: err.message });
       return;
     }
     res.json({ data: rows });
+  });
+});
+
+// Get a pet by ID
+app.get('/api/pets/:id', (req, res) => {
+  const { id } = req.params;
+  db.get(`SELECT * FROM pets WHERE id = ?`, [id], (err, row) => {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
+});
+
+// Update a pet by ID
+app.put('/api/pets/:id', (req, res) => {
+  const { id } = req.params;
+  const { user_id, name, species, breed, feeding_schedule, medical_history, care_needs } = req.body;
+  db.run(`UPDATE pets SET user_id = ?, name = ?, species = ?, breed = ?, feeding_schedule = ?, medical_history = ?, care_needs = ? WHERE id = ?`, 
+    [user_id, name, species, breed, feeding_schedule, medical_history, care_needs, id], function (err) {
+      if (err) {
+        res.status(404).json({ error: err.message });
+        return;
+      }
+      res.json({ updatedID: id });
+    });
+});
+
+// Delete a pet by ID
+app.delete('/api/pets/:id', (req, res) => {
+  const { id } = req.params;
+  db.run(`DELETE FROM pets WHERE id = ?`, [id], function (err) {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ deletedID: id });
   });
 });
 
 // CRUD operations for Schedules
 app.post('/api/schedules', (req, res) => {
   const { pet_id, feeding_time, grooming_time, vet_visit } = req.body;
-  db.run(`INSERT INTO schedules (pet_id, feeding_time, grooming_time, vet_visit) VALUES (?, ?, ?, ?)`, [pet_id, feeding_time, grooming_time, vet_visit], function (err) {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID });
-  });
+  db.run(`INSERT INTO schedules (pet_id, feeding_time, grooming_time, vet_visit) VALUES (?, ?, ?, ?)`, 
+    [pet_id, feeding_time, grooming_time, vet_visit], function (err) {
+      if (err) {
+        res.status(404).json({ error: err.message });
+        return;
+      }
+      res.status(201).json({ id: this.lastID });
+    });
 });
 
 app.get('/api/schedules', (req, res) => {
   db.all(`SELECT * FROM schedules`, [], (err, rows) => {
     if (err) {
-      res.status(400).json({ error: err.message });
+      res.status(404).json({ error: err.message });
       return;
     }
     res.json({ data: rows });
+  });
+});
+
+// Get a schedule by ID
+app.get('/api/schedules/:id', (req, res) => {
+  const { id } = req.params;
+  db.get(`SELECT * FROM schedules WHERE id = ?`, [id], (err, row) => {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
+});
+
+// Update a schedule by ID
+app.put('/api/schedules/:id', (req, res) => {
+  const { id } = req.params;
+  const { pet_id, feeding_time, grooming_time, vet_visit } = req.body;
+  db.run(`UPDATE schedules SET pet_id = ?, feeding_time = ?, grooming_time = ?, vet_visit = ? WHERE id = ?`, 
+    [pet_id, feeding_time, grooming_time, vet_visit, id], function (err) {
+      if (err) {
+        res.status(404).json({ error: err.message });
+        return;
+      }
+      res.json({ updatedID: id });
+    });
+});
+
+// Delete a schedule by ID
+app.delete('/api/schedules/:id', (req, res) => {
+  const { id } = req.params;
+  db.run(`DELETE FROM schedules WHERE id = ?`, [id], function (err) {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ deletedID: id });
   });
 });
 
@@ -153,7 +202,7 @@ app.post('/api/medical-records', (req, res) => {
   const { pet_id, record } = req.body;
   db.run(`INSERT INTO medical_records (pet_id, record) VALUES (?, ?)`, [pet_id, record], function (err) {
     if (err) {
-      res.status(400).json({ error: err.message });
+      res.status(404).json({ error: err.message });
       return;
     }
     res.status(201).json({ id: this.lastID });
@@ -163,15 +212,54 @@ app.post('/api/medical-records', (req, res) => {
 app.get('/api/medical-records', (req, res) => {
   db.all(`SELECT * FROM medical_records`, [], (err, rows) => {
     if (err) {
-      res.status(400).json({ error: err.message });
+      res.status(404).json({ error: err.message });
       return;
     }
     res.json({ data: rows });
   });
 });
 
-// Start the server
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Get a medical record by ID
+app.get('/api/medical-records/:id', (req, res) => {
+  const { id } = req.params;
+  db.get(`SELECT * FROM medical_records WHERE id = ?`, [id], (err, row) => {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
 });
+
+// Update a medical record by ID
+app.put('/api/medical-records/:id', (req, res) => {
+  const { id } = req.params;
+  const { pet_id, record } = req.body;
+  db.run(`UPDATE medical_records SET pet_id = ?, record = ? WHERE id = ?`, [pet_id, record, id], function (err) {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ updatedID: id });
+  });
+});
+
+// Delete a medical record by ID
+app.delete('/api/medical-records/:id', (req, res) => {
+  const { id } = req.params;
+  db.run(`DELETE FROM medical_records WHERE id = ?`, [id], function (err) {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.json({ deletedID: id });
+  });
+});
+
+// Start the server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+module.exports = app;
