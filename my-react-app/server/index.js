@@ -75,6 +75,25 @@ app.delete('/api/users/:id', (req, res) => {
   });
 });
 
+// Login endpoint
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  db.get(`SELECT * FROM users WHERE username = ? AND password = ?`, [username, password], (err, row) => {
+    if (err) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    if (row) {
+      // Successful login
+      res.json({ id: row.id, username: row.username });
+    } else {
+      // Invalid credentials
+      res.status(404).json({ error: 'Invalid username or password.' });
+    }
+  });
+});
+
+
 // CRUD operations for Pets
 app.post('/api/pets', (req, res) => {
   const { user_id, name, species, breed, feeding_schedule, medical_history, care_needs } = req.body;

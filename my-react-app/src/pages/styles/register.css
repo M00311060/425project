@@ -1,0 +1,85 @@
+/* register.css */
+.register-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #f7f7f7; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+  
+  .register-logo {
+    width: 150px; /* Adjust width to match login logo */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px; /* Space between logo and form */
+  }
+  
+  h2 {
+    margin-bottom: 20px; /* Space between header and form */
+    text-align: center;
+    color: #333;
+  }
+  
+  .register-form {
+    width: 100%; /* Full width for the form */
+    max-width: 400px; /* Limit form width */
+  }
+  
+  .register-form div {
+    margin-bottom: 15px; /* Space between input fields */
+  }
+  
+  .register-form input[type="text"],
+  .register-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .register-form input[type="text"]:focus,
+  .register-form input[type="password"]:focus {
+    border-color: #007bff; /* Border color on focus */
+    outline: none;
+  }
+  
+  .register-form .error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-bottom: 15px;
+  }
+  
+  .register-button {
+    background-color: #007bff; /* Button color */
+    color: white;
+    border: none;
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition */
+    margin-top: 10px; /* Space above the Register button */
+  }
+  
+  .register-button:hover {
+    background-color: #0056b3; /* Darker button color on hover */
+  }
+  
+  .register-form .login-link {
+    margin-top: 15px;
+    text-align: center;
+  }
+  
+  .register-form .login-link a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .register-form .login-link a:hover {
+    text-decoration: underline;
+  }
+  
