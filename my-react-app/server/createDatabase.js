@@ -6,12 +6,14 @@ db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
-    password TEXT
+    password TEXT,
+    first_name TEXT,
+    last_name TEXT
   )`, (err) => {
     if (err) {
       console.error('Error creating users table:', err.message);
     } else {
-      console.log('Users table created successfully');
+      console.log('Users table created successfully with first and last names');
     }
   });
 
@@ -66,12 +68,12 @@ db.serialize(() => {
 
 // Insert data into Users table
 const users = [
-  ['john_doe', 'password123'],
-  ['jane_smith', 'password456'],
-  ['mike_jones', 'password789']
+  ['john_doe', 'password123', 'John', 'Doe'],
+  ['jane_smith', 'password456', 'Jane', 'Smith'],
+  ['mike_jones', 'password789', 'Mike', 'Jones']
 ];
 users.forEach(user => {
-  db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, user, function(err) {
+  db.run(`INSERT INTO users (username, password, first_name, last_name) VALUES (?, ?, ?, ?)`, user, function(err) {
     if (err) {
       console.error('Error inserting into users:', err.message);
     } else {

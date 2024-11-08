@@ -16,16 +16,18 @@ const db = new sqlite3.Database('./mydb.sqlite', (err) => {
     console.log('Connected to the SQLite database.');
   }
 });
+
 // CRUD operations for Users
 app.post('/api/users', (req, res) => {
-  const { username, password } = req.body;
-  db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, [username, password], function (err) {
-    if (err) {
-      res.status(404).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ id: this.lastID });
-  });
+  const { username, password, first_name, last_name } = req.body;
+  db.run(`INSERT INTO users (username, password, first_name, last_name) VALUES (?, ?, ?, ?)`,
+    [username, password, first_name, last_name], function (err) {
+      if (err) {
+        res.status(404).json({ error: err.message });
+        return;
+      }
+      res.status(201).json({ id: this.lastID });
+    });
 });
 
 app.get('/api/users', (req, res) => {
@@ -53,14 +55,15 @@ app.get('/api/users/:id', (req, res) => {
 // Update a user by ID
 app.put('/api/users/:id', (req, res) => {
   const { id } = req.params;
-  const { username, password } = req.body;
-  db.run(`UPDATE users SET username = ?, password = ? WHERE id = ?`, [username, password, id], function (err) {
-    if (err) {
-      res.status(404).json({ error: err.message });
-      return;
-    }
-    res.json({ updatedID: id });
-  });
+  const { username, password, first_name, last_name } = req.body;
+  db.run(`UPDATE users SET username = ?, password = ?, first_name = ?, last_name = ? WHERE id = ?`,
+    [username, password, first_name, last_name, id], function (err) {
+      if (err) {
+        res.status(404).json({ error: err.message });
+        return;
+      }
+      res.json({ updatedID: id });
+    });
 });
 
 // Delete a user by ID
@@ -84,15 +87,12 @@ app.post('/api/login', (req, res) => {
       return;
     }
     if (row) {
-      // Successful login
-      res.json({ id: row.id, username: row.username });
+      res.json({ id: row.id, username: row.username, first_name: row.first_name, last_name: row.last_name });
     } else {
-      // Invalid credentials
       res.status(404).json({ error: 'Invalid username or password.' });
     }
   });
 });
-
 
 // CRUD operations for Pets
 app.post('/api/pets', (req, res) => {
