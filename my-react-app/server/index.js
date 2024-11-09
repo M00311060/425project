@@ -94,6 +94,24 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+// Get pets with owner info
+app.get('/api/pets', (req, res) => {
+  const query = `
+    SELECT pets.id, pets.name, pets.species, pets.breed, pets.feeding_schedule, pets.medical_history, pets.care_needs, 
+      users.first_name, users.last_name 
+    FROM pets
+    JOIN users ON pets.user_id = users.id`;
+
+  db.all(query, [], (err, rows) => {
+      if (err) {
+          console.error(err);
+          res.status(500).send('Error retrieving pets');
+      } else {
+          res.json({ data: rows });
+      }
+  });
+});
+
 // CRUD operations for Pets
 app.post('/api/pets', (req, res) => {
   const { user_id, name, species, breed, feeding_schedule, medical_history, care_needs } = req.body;
