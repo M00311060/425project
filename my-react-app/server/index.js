@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 
 // Initialize Express app
 const app = express();
@@ -81,13 +82,29 @@ app.delete('/api/users/:id', (req, res) => {
 // Login endpoint
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
-  db.get(`SELECT * FROM users WHERE username = ? AND password = ?`, [username, password], (err, row) => {
+
+  db.get(`SELECT * FROM users WHERE username = ?`, [username], (err, row) => {
     if (err) {
       res.status(404).json({ error: err.message });
       return;
     }
+
     if (row) {
-      res.json({ id: row.id, username: row.username, first_name: row.first_name, last_name: row.last_name });
+      // Compare the hashed password with the entered password
+      bcrypt.compare(password, row.password, (err, result) => {
+        if (err) {
+          res.status(404).json({ error: err.message });
+          return;
+        }
+
+        if (result) {
+          // Password matched
+          res.json({ id: row.id, username: row.username, first_name: row.first_name, last_name: row.last_name });
+        } else {
+          // Invalid password
+          res.status(404).json({ error: 'Invalid username or password.' });
+        }
+      });
     } else {
       res.status(404).json({ error: 'Invalid username or password.' });
     }
