@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 // Initialize Express app
 const app = express();
@@ -16,6 +17,29 @@ const db = new sqlite3.Database('./mydb.sqlite', (err) => {
   } else {
     console.log('Connected to the SQLite database.');
   }
+});
+
+// User Registration
+app.post('/api/users', (req, res) => {
+  const { first_name, last_name, username, password } = req.body;
+
+  // Hash the password
+  bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+    if (err) {
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+
+    // Insert the new user into the database with the hashed password
+    const query = `INSERT INTO users (first_name, last_name, username, password) VALUES (?, ?, ?, ?)`;
+    db.run(query, [first_name, last_name, username, hashedPassword], function (err) {
+      if (err) {
+        res.status(500).json({ error: 'Error registering user' });
+        return;
+      }
+      res.status(201).json({ id: this.lastID });
+    });
+  });
 });
 
 // CRUD operations for Users

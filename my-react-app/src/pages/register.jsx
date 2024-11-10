@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import '../pages/styles/register.css'; // Adjust path as needed
+import '../pages/styles/register.css';
 
 const Register = () => {
   const [first_name, setFirstName] = useState('');
@@ -24,10 +24,10 @@ const Register = () => {
       if (response.status === 201) {
         setSuccess(true);
         setError(null);
-        setTimeout(() => navigate('/petList'), 2000); // Redirect to login after success
+        setTimeout(() => navigate('/petList'), 2000);
       }
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError(err.response?.data?.error || 'Registration failed. Please try again.');
       console.error(err);
     }
   };
