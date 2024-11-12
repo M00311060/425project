@@ -4,7 +4,6 @@ import Footer from '../components/Footer';
 import './styles/PetProfilesPage.css';
 
 const PetProfilesPage = () => {
-  // Assuming we have a userId from login context or session
   const userId = 1; // Example user ID, replace with actual login info or context
 
   const [pets, setPets] = useState([]);
