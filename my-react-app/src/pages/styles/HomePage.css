@@ -1,0 +1,49 @@
+/* HomePage.css */
+
+.homepage {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 2em;
+    background-color: #f9f9f9;
+  }
+  
+  .intro {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .intro h2 {
+    color: #333;
+  }
+  
+  .intro p {
+    font-size: 1.1em;
+    line-height: 1.6;
+  }
+  
+  .intro ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+  
+  .get-started-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .get-started-button:hover {
+    background-color: #0056b3;
+  }

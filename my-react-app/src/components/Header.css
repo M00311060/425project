@@ -1,0 +1,56 @@
+/* src/components/Header.css */
+
+.header {
+    background-color: #333;
+    padding: 1em;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 60px; 
+    margin-right: 10px;
+}
+
+.header h1 {
+    margin: 0;
+}
+
+/* Default style for nav links */
+.header nav a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+/* Specific styles for Home and Login links */
+.header nav a[href="/"] {
+    background-color: #007bff; /* Home button color */
+    color: white;
+}
+
+.header nav a[href="/login"] {
+    background-color: #007bff; /* Login button color */
+    color: white;
+}
+
+/* Hover effect for nav links */
+.header nav a:hover {
+    text-decoration: none;
+    background-color: #0056b3; /* Darker blue for Home on hover */
+}
+
+.header nav a[href="/login"]:hover {
+    background-color: #0056b3; /* Darker green for Login on hover */
+}

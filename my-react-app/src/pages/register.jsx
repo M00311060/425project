@@ -24,7 +24,7 @@ const Register = () => {
       if (response.status === 201) {
         setSuccess(true);
         setError(null);
-        setTimeout(() => navigate('/petList'), 2000);
+        setTimeout(() => navigate('/petProfile'), 2000);
       }
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed. Please try again.');
