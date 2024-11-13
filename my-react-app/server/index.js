@@ -153,6 +153,30 @@ app.get('/api/pets', (req, res) => {
   });
 });
 
+// Fetch all pets for a user by user_id
+app.get('/api/users/:userId/pets', (req, res) => {
+  const userId = req.params.userId;
+  db.all(`SELECT * FROM pets WHERE user_id = ?`, [userId], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ pets: rows });
+  });
+});
+
+// Fetch schedules for a specific pet
+app.get('/api/pets/:petId/schedules', (req, res) => {
+  const petId = req.params.petId;
+  db.all(`SELECT * FROM schedules WHERE pet_id = ?`, [petId], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ schedules: rows });
+  });
+});
+
 // CRUD operations for Pets
 app.post('/api/pets', (req, res) => {
   const { user_id, name, species, breed, feeding_schedule, medical_history, care_needs } = req.body;

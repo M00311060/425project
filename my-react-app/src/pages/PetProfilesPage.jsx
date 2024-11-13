@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Footer2 from '../components/Footer2';
 import './styles/PetProfilesPage.css';
 
 const PetProfilesPage = () => {
-  const userId = 1; // Example user ID, replace with actual login info or context
-
   const [pets, setPets] = useState([]);
   const [form, setForm] = useState({
     name: '',
@@ -15,6 +13,8 @@ const PetProfilesPage = () => {
     medical_history: '',
     care_needs: ''
   });
+
+  const userId = JSON.parse(localStorage.getItem('user'))?.id;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -98,9 +98,9 @@ const PetProfilesPage = () => {
           <h3>Your Pets</h3>
           {pets.length > 0 ? (
             <ul>
-              {pets.map((pet, index) => (
-                <li key={index} className="pet-card">
-                  <h4>{pet.name}</h4>
+              {pets.map((pet) => (
+                <li key={pet.id} className="pet-card">
+                  <p>{pet.name}</p>
                   <p>Species: {pet.species}</p>
                   <p>Breed: {pet.breed}</p>
                   <p>Feeding Schedule: {pet.feeding_schedule}</p>
@@ -114,7 +114,7 @@ const PetProfilesPage = () => {
           )}
         </section>
       </main>
-      <Footer />
+      <Footer2 />
     </div>
   );
 };

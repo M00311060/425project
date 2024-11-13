@@ -36,21 +36,23 @@
 
 /* Specific styles for Home and Login links */
 .header nav a[href="/"] {
-    background-color: #007bff; /* Home button color */
-    color: white;
+    background-color: white; /* Home button color */
+    color: #007bff;
 }
 
 .header nav a[href="/login"] {
-    background-color: #007bff; /* Login button color */
-    color: white;
+    background-color: white; /* Login button color */
+    color: #007bff;
 }
 
 /* Hover effect for nav links */
 .header nav a:hover {
     text-decoration: none;
-    background-color: #0056b3; /* Darker blue for Home on hover */
+    background-color: #007bff; 
+    color: white;
 }
 
 .header nav a[href="/login"]:hover {
-    background-color: #0056b3; /* Darker green for Login on hover */
+    background-color: #007bff; 
+    color: white;
 }

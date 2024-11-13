@@ -18,7 +18,7 @@ const Login = () => {
       if (response.status === 200) {
         // Successfully logged in
         localStorage.setItem('user', JSON.stringify(response.data));
-        navigate('/petProfile'); // Redirect to the homePage after successful login
+        navigate('/dash'); // Redirect to the homePage after successful login
       }
     } catch (err) {
       setError('Login failed. Please check your username and password.');
