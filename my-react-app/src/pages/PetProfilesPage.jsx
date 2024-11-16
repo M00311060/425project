@@ -15,48 +15,15 @@ const PetProfilesPage = () => {
     breed: '',
     feeding_schedule: '',
     medical_history: '',
-    care_needs: ''
+    care_needs: '',
   });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editPetId, setEditPetId] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-  };
-
-  const handleAddPet = async (e) => {
-    e.preventDefault();
-    
-    if (form.name && form.species && form.breed && form.feeding_schedule && form.medical_history && form.care_needs) {
-      const newPet = { ...form, user_id: userId };
-
-      try {
-        const response = await fetch('/api/pets', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newPet),
-        });
-
-        if (response.ok) {
-          setSuccessMessage('Your pet has been added!');
-          setForm({
-            name: '',
-            species: '',
-            breed: '',
-            feeding_schedule: '',
-            medical_history: '',
-            care_needs: '',
-          });
-          handleFetchPets();
-        } else {
-          throw new Error('Failed to add pet');
-        }
-      } catch (error) {
-        setErrorMessage('There was an error adding the pet');
-        console.error(error);
-      }
-    }
   };
 
   const handleFetchPets = async () => {
@@ -72,6 +39,80 @@ const PetProfilesPage = () => {
       setErrorMessage('There was an error fetching the pets');
       console.error(error);
     }
+  };
+
+  const handleAddOrUpdatePet = async (e) => {
+    e.preventDefault();
+
+    if (!form.name || !form.species || !form.breed || !form.feeding_schedule || !form.medical_history || !form.care_needs) {
+      setErrorMessage('All fields are required');
+      return;
+    }
+
+    const petData = { ...form, user_id: userId };
+
+    try {
+      if (isEditing) {
+        // Update pet
+        const response = await fetch(`/api/pets/${editPetId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(petData),
+        });
+
+        if (response.ok) {
+          setSuccessMessage('Pet updated successfully!');
+        } else {
+          throw new Error('Failed to update pet');
+        }
+      } else {
+        // Add new pet
+        const response = await fetch('/api/pets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(petData),
+        });
+
+        if (response.ok) {
+          setSuccessMessage('Your pet has been added!');
+        } else {
+          throw new Error('Failed to add pet');
+        }
+      }
+
+      // Reset form and state
+      setForm({
+        name: '',
+        species: '',
+        breed: '',
+        feeding_schedule: '',
+        medical_history: '',
+        care_needs: '',
+      });
+      setEditPetId(null);
+      setIsEditing(false);
+      handleFetchPets();
+    } catch (error) {
+      setErrorMessage('There was an error processing your request');
+      console.error(error);
+    }
+  };
+
+  const handleEditPet = (pet) => {
+    setForm({
+      name: pet.name,
+      species: pet.species,
+      breed: pet.breed,
+      feeding_schedule: pet.feeding_schedule,
+      medical_history: pet.medical_history,
+      care_needs: pet.care_needs,
+    });
+    setEditPetId(pet.id);
+    setIsEditing(true);
   };
 
   const handleDeletePet = async (id) => {
@@ -115,6 +156,9 @@ const PetProfilesPage = () => {
                 <p>Feeding Schedule: {pet.feeding_schedule}</p>
                 <p>Medical History: {pet.medical_history}</p>
                 <p>Care Needs: {pet.care_needs}</p>
+                <button className="edit-pet-button" onClick={() => handleEditPet(pet)}>
+                  Edit Pet
+                </button>
                 <button
                   className="delete-pet-button"
                   onClick={() => handleDeletePet(pet.id)}
@@ -127,8 +171,8 @@ const PetProfilesPage = () => {
             <p>No pets found. Add a pet to get started!</p>
           )}
         </div>
-        
-        <form className="add-pet-form" onSubmit={handleAddPet}>
+
+        <form className="add-pet-form" onSubmit={handleAddOrUpdatePet}>
           <label>
             Pet Name:
             <input type="text" name="name" value={form.name} onChange={handleInputChange} required />
@@ -153,7 +197,7 @@ const PetProfilesPage = () => {
             Care Needs:
             <input type="text" name="care_needs" value={form.care_needs} onChange={handleInputChange} required />
           </label>
-          <button type="submit">Add Pet</button>
+          <button type="submit">{isEditing ? 'Update Pet' : 'Add Pet'}</button>
         </form>
       </main>
 
