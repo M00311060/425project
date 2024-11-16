@@ -1,0 +1,33 @@
+/* General container styles */
+div {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* List styling */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Text styling */
+strong {
+    color: #555;
+}
+
+p {
+    text-align: center;
+    color: #888;
+    font-size: 1.2em;
+}

@@ -16,6 +16,10 @@ const DashboardPage = () => {
     navigate('/petProfile');
   };
 
+  const goToMedicalRecordsPage = () => {
+    navigate('/records');
+  };
+
   return (
     <div className="dashboard-container">
         <Header />
@@ -28,6 +32,9 @@ const DashboardPage = () => {
         </button>
         <button onClick={goToPetProfilePage} className="dashboard-button">
           Create Pet
+        </button>
+          <button onClick={goToMedicalRecordsPage} className="dashboard-button">
+          Medical Records
         </button>
       </div>
 

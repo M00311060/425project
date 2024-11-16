@@ -299,6 +299,34 @@ app.delete('/api/schedules/:id', (req, res) => {
   });
 });
 
+// Get all medical records for the logged-in user
+app.get('/api/medical-records/user/:userId', (req, res) => {
+  const { userId } = req.params;
+  
+  const query = `
+    SELECT 
+      medical_records.id AS record_id,
+      pets.name AS pet_name,
+      medical_records.record AS record
+    FROM 
+      medical_records
+    JOIN 
+      pets ON pets.id = medical_records.pet_id
+    JOIN 
+      users ON users.id = pets.user_id
+    WHERE 
+      users.id = ?
+  `;
+  
+  db.all(query, [userId], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
+});
+
 // CRUD operations for Medical Records
 app.post('/api/medical-records', (req, res) => {
   const { pet_id, record } = req.body;
