@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../pages/styles/DashboardPage.css';
-import Header from '../components/Header';
+import Header2 from '../components/Header2';
 import Footer2 from '../components/Footer2';
 
 
@@ -22,7 +22,7 @@ const DashboardPage = () => {
 
   return (
     <div className="dashboard-container">
-        <Header />
+        <Header2 />
 
       <h1 className="dashboard-title">Welcome to Your Dashboard</h1>
       <p className="dashboard-text">Select an option below to get started:</p>
@@ -31,7 +31,7 @@ const DashboardPage = () => {
           Pet Schedule
         </button>
         <button onClick={goToPetProfilePage} className="dashboard-button">
-          Create Pet
+          Manage Pets
         </button>
           <button onClick={goToMedicalRecordsPage} className="dashboard-button">
           Medical Records

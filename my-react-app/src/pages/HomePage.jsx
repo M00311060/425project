@@ -26,9 +26,9 @@ const HomePage = () => {
             <li>Sync Schedules with Google Calendar</li>
           </ul>
           <p>
-            Join us in making pet management easier and more organized. Sign up today!
+            Join us in making pet management easier and more organized. Sign up today below!
           </p>
-          <Link to="/register" className="get-started-button">Get Started</Link>
+          <Link to="/login" className="get-started-button">Get Started</Link>
         </section>
       </main>
 

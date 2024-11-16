@@ -7,7 +7,7 @@
   }
   
   .main-content {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
     background-color: white;
@@ -55,7 +55,37 @@
   .add-pet-form button:hover {
     background-color: #0056b3;
   }
+
+  .fetch-pets-button{
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
   
+  .fetch-pets-button:hover{
+    background-color: #0056b3;
+  }
+
+  .delete-pet-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .delete-pet-button:hover {
+    background-color: #c82333;
+  }
+
   .pet-list {
     margin-top: 40px;
   }

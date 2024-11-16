@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Header from '../components/Header';
+import Header2 from '../components/Header2';
 import Footer2 from '../components/Footer2';
 import './styles/MedicalRecordsPage.css';
 
@@ -23,7 +23,7 @@ const MedicalRecordsPage = () => {
 
   return (
     <div>
-        <Header />
+        <Header2 />
       <h2>Medical Records</h2>
       {medicalRecords.length > 0 ? (
         <ul>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Header from '../components/Header';
+import Header2 from '../components/Header2';
 import Footer2 from '../components/Footer2';
+import './styles/PetSchedulePage.css';
 
 const PetSchedulePage = ({ userId: propUserId }) => {
   const [pets, setPets] = useState([]);
@@ -39,7 +40,7 @@ const PetSchedulePage = ({ userId: propUserId }) => {
 
   return (
     <div>
-        <Header />
+        <Header2 />
 
       <h1>Pet Care Schedule</h1>
 

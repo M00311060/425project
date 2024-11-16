@@ -35,8 +35,8 @@
 }
 
 /* Specific styles for Home and Login links */
-.header nav a[href="/"] {
-    background-color: white; /* Home button color */
+.header nav a[href="/dash"] {
+    background-color: white; /* dash button color */
     color: #007bff;
 }
 
