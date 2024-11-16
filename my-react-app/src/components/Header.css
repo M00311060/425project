@@ -40,7 +40,7 @@
     color: #007bff;
 }
 
-.header nav a[href="/login"] {
+.header nav a[href="/"] {
     background-color: white; /* Login button color */
     color: #007bff;
 }

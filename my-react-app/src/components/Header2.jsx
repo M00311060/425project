@@ -12,7 +12,7 @@ const Header2 = () => {
       </div>
       <nav>
         <Link to="/dash">Dashboard</Link>
-        <Link to="/login">Logout</Link>
+        <Link to="/">Logout</Link>
       </nav>
     </header>
   );
