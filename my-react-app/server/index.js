@@ -327,15 +327,44 @@ app.get('/api/medical-records/user/:userId', (req, res) => {
   });
 });
 
-// CRUD operations for Medical Records
+// Add a new medical record using pet name
 app.post('/api/medical-records', (req, res) => {
-  const { pet_id, record } = req.body;
-  db.run(`INSERT INTO medical_records (pet_id, record) VALUES (?, ?)`, [pet_id, record], function (err) {
+  const { userId, pet_name, record } = req.body;
+
+  // Query to find the pet_id based on pet_name and userId
+  const getPetIdQuery = `
+    SELECT pets.id AS pet_id 
+    FROM pets
+    JOIN users ON users.id = pets.user_id
+    WHERE pets.name = ? AND users.id = ?
+  `;
+
+  db.get(getPetIdQuery, [pet_name, userId], (err, row) => {
     if (err) {
-      res.status(404).json({ error: err.message });
+      res.status(500).json({ error: `Error finding pet: ${err.message}` });
       return;
     }
-    res.status(201).json({ id: this.lastID });
+    
+    if (!row) {
+      res.status(404).json({ error: 'Pet not found for this user.' });
+      return;
+    }
+
+    const pet_id = row.pet_id;
+
+    // Insert the new medical record with the retrieved pet_id
+    const insertRecordQuery = `
+      INSERT INTO medical_records (pet_id, record)
+      VALUES (?, ?)
+    `;
+
+    db.run(insertRecordQuery, [pet_id, record], function (err) {
+      if (err) {
+        res.status(500).json({ error: `Error adding medical record: ${err.message}` });
+        return;
+      }
+      res.status(201).json({ id: this.lastID });
+    });
   });
 });
 
