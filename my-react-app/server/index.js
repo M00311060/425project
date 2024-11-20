@@ -135,6 +135,69 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+// Fetch all pets for a user by user_id
+app.get('/api/users/:userId/pets', (req, res) => {
+  const userId = req.params.userId;
+  db.all(`SELECT * FROM pets WHERE user_id = ?`, [userId], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ pets: rows });
+  });
+});
+
+// Get schedules for pets
+app.get('/api/users/:userId/pets/schedules', (req, res) => {
+  const userId = req.params.userId;
+
+  // Log the userId to ensure it's correctly captured
+  console.log(`Fetching schedules for userId: ${userId}`);
+
+  // Query to fetch all pets for the user
+  db.all(
+    `SELECT pets.id AS pet_id, schedules.feeding_time, schedules.grooming_time, schedules.vet_visit_date 
+     FROM pets
+     LEFT JOIN schedules ON pets.id = schedules.pet_id
+     WHERE pets.user_id = ?`,
+    [userId],
+    (err, rows) => {
+      if (err) {
+        console.error('Database error:', err); // Log the error
+        res.status(500).json({ error: err.message });
+        return;
+      }
+
+      // Log the rows to ensure the data is returned correctly
+      console.log('Fetched rows:', rows);
+
+      if (rows.length === 0) {
+        console.log('No schedules found for user:', userId); // Log if no schedules found
+        res.json({ petSchedules: {} }); // Return an empty object if no schedules found
+        return;
+      }
+
+      // Organize schedules by pet
+      const petSchedules = rows.reduce((acc, row) => {
+        if (!acc[row.pet_id]) {
+          acc[row.pet_id] = [];
+        }
+        acc[row.pet_id].push({
+          feeding_time: row.feeding_time,
+          grooming_time: row.grooming_time,
+          vet_visit_date: row.vet_visit_date
+        });
+        return acc;
+      }, {});
+
+      // Log the final structure of petSchedules for debugging
+      console.log('Pet schedules organized:', petSchedules);
+
+      res.json({ petSchedules });
+    }
+  );
+});
+
 // Get pets with owner info
 app.get('/api/pets', (req, res) => {
   const query = `
@@ -153,28 +216,18 @@ app.get('/api/pets', (req, res) => {
   });
 });
 
-// Fetch all pets for a user by user_id
-app.get('/api/users/:userId/pets', (req, res) => {
-  const userId = req.params.userId;
-  db.all(`SELECT * FROM pets WHERE user_id = ?`, [userId], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ pets: rows });
-  });
-});
+// Endpoint to get pet name by petId
+app.get('/pet/:petId', (req, res) => {
+  const petId = parseInt(req.params.petId); // Parse the petId from the URL
+  const pet = pets.find(pet => pet.id === petId); // Find the pet with the matching id
 
-// Fetch schedules for a specific pet
-app.get('/api/pets/:petId/schedules', (req, res) => {
-  const petId = req.params.petId;
-  db.all(`SELECT * FROM schedules WHERE pet_id = ?`, [petId], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ schedules: rows });
-  });
+  if (pet) {
+    // If pet is found, return the pet name
+    res.json({ name: pet.name });
+  } else {
+    // If pet is not found, return an error message
+    res.status(404).json({ error: 'Pet not found' });
+  }
 });
 
 // CRUD operations for Pets
@@ -240,9 +293,9 @@ app.delete('/api/pets/:id', (req, res) => {
 
 // CRUD operations for Schedules
 app.post('/api/schedules', (req, res) => {
-  const { pet_id, feeding_time, grooming_time, vet_visit } = req.body;
-  db.run(`INSERT INTO schedules (pet_id, feeding_time, grooming_time, vet_visit) VALUES (?, ?, ?, ?)`, 
-    [pet_id, feeding_time, grooming_time, vet_visit], function (err) {
+  const { pet_id, feeding_time, grooming_time, vet_visit_date } = req.body;
+  db.run(`INSERT INTO schedules (pet_id, feeding_time, grooming_time, vet_visit_date) VALUES (?, ?, ?, ?)`, 
+    [pet_id, feeding_time, grooming_time, vet_visit_date], function (err) {
       if (err) {
         res.status(404).json({ error: err.message });
         return;
@@ -276,9 +329,9 @@ app.get('/api/schedules/:id', (req, res) => {
 // Update a schedule by ID
 app.put('/api/schedules/:id', (req, res) => {
   const { id } = req.params;
-  const { pet_id, feeding_time, grooming_time, vet_visit } = req.body;
-  db.run(`UPDATE schedules SET pet_id = ?, feeding_time = ?, grooming_time = ?, vet_visit = ? WHERE id = ?`, 
-    [pet_id, feeding_time, grooming_time, vet_visit, id], function (err) {
+  const { pet_id, feeding_time, grooming_time, vet_visit_date } = req.body;
+  db.run(`UPDATE schedules SET pet_id = ?, feeding_time = ?, grooming_time = ?, vet_visit_date = ? WHERE id = ?`, 
+    [pet_id, feeding_time, grooming_time, vet_visit_date, id], function (err) {
       if (err) {
         res.status(404).json({ error: err.message });
         return;

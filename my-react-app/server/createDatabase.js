@@ -61,21 +61,24 @@ db.serialize(() => {
     }
   });
 
-  // Create Schedules table
-  db.run(`CREATE TABLE IF NOT EXISTS schedules (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pet_id INTEGER,
-    feeding_time TEXT,
-    grooming_time TEXT,
-    vet_visit TEXT,
-    FOREIGN KEY (pet_id) REFERENCES pets(id)
-  )`, (err) => {
-    if (err) {
-      console.error('Error creating schedules table:', err.message);
-    } else {
-      console.log('Schedules table created successfully');
-    }
-  });
+// Create new Schedules table
+db.run(`CREATE TABLE IF NOT EXISTS schedules (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  pet_id INTEGER,
+  feeding_time TEXT,
+  feeding_date TEXT,  -- New date column to store the date for feeding schedule
+  grooming_time TEXT,
+  grooming_date TEXT,  -- New date column to store the date for grooming schedule
+  vet_visit_date TEXT,
+  FOREIGN KEY (pet_id) REFERENCES pets(id)
+)`, (err) => {
+  if (err) {
+    console.error('Error creating schedules table:', err.message);
+  } else {
+    console.log('Schedules table created successfully with feeding_date and grooming_date');
+  }
+});
+
 
   // Create Medical Records table
   db.run(`CREATE TABLE IF NOT EXISTS medical_records (
@@ -91,43 +94,43 @@ db.serialize(() => {
     }
   });
 
- // Insert data into Users table with hashed passwords
- const users = [
-  ['john_doe', 'password123', 'John', 'Doe'],
-  ['jane_smith', 'password456', 'Jane', 'Smith'],
-  ['mike_jones', 'password789', 'Mike', 'Jones']
-];
+  // Insert data into Users table with hashed passwords
+  const users = [
+    ['john_doe', 'password123', 'John', 'Doe'],
+    ['jane_smith', 'password456', 'Jane', 'Smith'],
+    ['mike_jones', 'password789', 'Mike', 'Jones']
+  ];
 
-let userInsertCount = 0; // Counter for how many users have been inserted
+  let userInsertCount = 0; // Counter for how many users have been inserted
 
-users.forEach(user => {
-  bcrypt.hash(user[1], 10, (err, hashedPassword) => {
-    if (err) {
-      console.error('Error hashing password:', err.message);
-    } else {
-      // Insert the user with the hashed password
-      db.run(`INSERT INTO users (username, password, first_name, last_name) VALUES (?, ?, ?, ?)`, 
-      [user[0], hashedPassword, user[2], user[3]], function(err) {
-        if (err) {
-          console.error('Error inserting into users:', err.message);
-        } else {
-          console.log(`Inserted user with ID ${this.lastID}`);
-        }
-        userInsertCount++;
-        // Check if all users are inserted, then close the database
-        if (userInsertCount === users.length) {
-          db.close((err) => {
-            if (err) {
-              console.error('Error closing database:', err.message);
-            } else {
-              console.log('Database connection closed');
-            }
-          });
-        }
-      });
-    }
+  users.forEach(user => {
+    bcrypt.hash(user[1], 10, (err, hashedPassword) => {
+      if (err) {
+        console.error('Error hashing password:', err.message);
+      } else {
+        // Insert the user with the hashed password
+        db.run(`INSERT INTO users (username, password, first_name, last_name) VALUES (?, ?, ?, ?)`, 
+        [user[0], hashedPassword, user[2], user[3]], function(err) {
+          if (err) {
+            console.error('Error inserting into users:', err.message);
+          } else {
+            console.log(`Inserted user with ID ${this.lastID}`);
+          }
+          userInsertCount++;
+          // Check if all users are inserted, then close the database
+          if (userInsertCount === users.length) {
+            db.close((err) => {
+              if (err) {
+                console.error('Error closing database:', err.message);
+              } else {
+                console.log('Database connection closed');
+              }
+            });
+          }
+        });
+      }
+    });
   });
-});
 
   // Insert data into Pets table
   const pets = [
@@ -163,54 +166,36 @@ users.forEach(user => {
   });
 
   // Insert data into Schedules table
-  const schedules = [
-    [1, '08:00', '10:00', '2024-12-01'],
-    [1, '08:30', '10:15', '2024-11-18'],
-    [1, '09:00', '11:00', '2024-11-25'],
-    [1, '07:00', '09:00', '2024-11-30'],
-    [1, '08:30', '10:30', '2024-11-20'],
-    [1, '09:00', '11:30', '2024-12-05'],
-    [2, '09:00', '10:00', '2024-11-15'],
-    [2, '10:00', '11:30', '2024-12-02'],
-    [2, '07:30', '09:30', '2024-12-10'],
-    [2, '09:15', '10:45', '2024-12-17'],
-    [2, '08:00', '11:00', '2024-11-28'],
-    [2, '09:45', '11:15', '2024-12-03'],
-    [3, '07:00', '09:30', '2024-11-22'],
-    [3, '08:15', '10:45', '2024-12-04'],
-    [3, '06:30', '10:00', '2024-12-06'],
-    [3, '08:45', '11:30', '2024-12-10'],
-    [3, '07:15', '10:30', '2024-11-30'],
-    [3, '09:30', '10:15', '2024-12-01']
-  ];
+const schedules = [
+  [1, '08:00', '2024-12-01', '10:00', '2024-11-20', '2024-12-10'],
+  [1, '08:30', '2024-11-18', '10:15', '2024-11-18', '2024-11-20'],
+  [1, '09:00', '2024-11-25', '11:00', '2024-11-22', '2024-12-02'],
+  [1, '07:00', '2024-11-30', '09:00', '2024-11-28', '2024-11-29'],
+  [1, '08:30', '2024-11-20', '10:30', '2024-11-21', '2024-12-03'],
+  [1, '09:00', '2024-12-05', '11:30', '2024-12-02', '2024-12-06'],
+  [2, '09:00', '2024-11-15', '10:00', '2024-11-18', '2024-12-05'],
+  [2, '10:00', '2024-12-02', '11:30', '2024-12-03', '2024-12-08'],
+  [2, '07:30', '2024-12-10', '09:30', '2024-12-12', '2024-12-15'],
+  [2, '09:15', '2024-12-17', '10:45', '2024-12-18', '2024-12-20'],
+  [2, '08:00', '2024-11-28', '11:00', '2024-11-25', '2024-11-30'],
+  [2, '09:45', '2024-12-03', '11:15', '2024-12-05', '2024-12-09'],
+  [3, '07:00', '2024-11-22', '09:30', '2024-11-20', '2024-11-23'],
+  [3, '08:00', '2024-11-29', '10:00', '2024-12-01', '2024-12-03'],
+  [3, '08:30', '2024-12-04', '10:15', '2024-12-06', '2024-12-07'],
+  [3, '09:00', '2024-11-21', '10:45', '2024-11-20', '2024-11-22'],
+  [3, '09:30', '2024-12-07', '11:00', '2024-12-10', '2024-12-12'],
+  [3, '07:30', '2024-11-25', '09:30', '2024-11-27', '2024-12-01']
+];
 
-  schedules.forEach(schedule => {
-    db.run(`INSERT INTO schedules (pet_id, feeding_time, grooming_time, vet_visit) VALUES (?, ?, ?, ?)`,
-      schedule, function(err) {
-        if (err) {
-          console.error('Error inserting into schedules:', err.message);
-        } else {
-          console.log(`Inserted schedule with ID ${this.lastID}`);
-        }
-      });
-  });
-
-  // Insert data into Medical Records table
-  const medicalRecords = [
-    [1, 'Routine check-up: Healthy, all vaccinations up to date'],
-    [1, 'Arthritis medication prescribed, needs joint supplement'],
-    [2, 'Routine check-up: Healthy, vaccinations up to date'],
-    [3, 'Annual vet visit: Healthy, no issues reported']
-  ];
-
-  medicalRecords.forEach(record => {
-    db.run(`INSERT INTO medical_records (pet_id, record) VALUES (?, ?)`,
-      record, function(err) {
-        if (err) {
-          console.error('Error inserting into medical_records:', err.message);
-        } else {
-          console.log(`Inserted medical record with ID ${this.lastID}`);
-        }
-      });
+schedules.forEach(schedule => {
+  db.run(`INSERT INTO schedules (pet_id, feeding_time, feeding_date, grooming_time, grooming_date, vet_visit_date) VALUES (?, ?, ?, ?, ?, ?)`,
+    schedule, function(err) {
+      if (err) {
+        console.error('Error inserting into schedules:', err.message);
+      } else {
+        console.log(`Inserted schedule with ID ${this.lastID}`);
+      }
+    });
   });
 });
+
