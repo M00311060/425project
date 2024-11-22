@@ -86,7 +86,7 @@ const PetSchedulePage = () => {
 
   // Function to get the pet name by petId
   const getPetNameById = (petId) => {
-    const pet = pets.find(pet => pet.id === petId);
+    const pet = pets.find(pet => pet.name === petId);
     return pet ? pet.name : 'Unknown Pet';
   };
 
