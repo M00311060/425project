@@ -154,45 +154,37 @@ app.get('/api/users/:userId/pets/schedules', (req, res) => {
   // Log the userId to ensure it's correctly captured
   console.log(`Fetching schedules for userId: ${userId}`);
 
-  // Query to fetch all pets for the user
+  // Query to fetch all pets for the user, including the pet name
   db.all(
-    `SELECT pets.id AS pet_id, schedules.feeding_time, schedules.grooming_time, schedules.vet_visit_date 
+    `SELECT pets.id AS pet_id, pets.name AS pet_name, schedules.feeding_time, schedules.grooming_time, schedules.vet_visit_date
      FROM pets
      LEFT JOIN schedules ON pets.id = schedules.pet_id
      WHERE pets.user_id = ?`,
     [userId],
     (err, rows) => {
       if (err) {
-        console.error('Database error:', err); // Log the error
+        console.error('Database error:', err);
         res.status(500).json({ error: err.message });
         return;
       }
-
-      // Log the rows to ensure the data is returned correctly
+  
       console.log('Fetched rows:', rows);
-
+  
       if (rows.length === 0) {
-        console.log('No schedules found for user:', userId); // Log if no schedules found
-        res.json({ petSchedules: {} }); // Return an empty object if no schedules found
+        console.log('No schedules found for user:', userId);
+        res.json({ petSchedules: [] });
         return;
       }
-
-      // Organize schedules by pet
-      const petSchedules = rows.reduce((acc, row) => {
-        if (!acc[row.pet_id]) {
-          acc[row.pet_id] = [];
-        }
-        acc[row.pet_id].push({
-          feeding_time: row.feeding_time,
-          grooming_time: row.grooming_time,
-          vet_visit_date: row.vet_visit_date
-        });
-        return acc;
-      }, {});
-
-      // Log the final structure of petSchedules for debugging
-      console.log('Pet schedules organized:', petSchedules);
-
+  
+      // Map rows into an array of schedule objects with pet name and other details
+      const petSchedules = rows.map((row) => ({
+        pet_name: row.pet_name, 
+        feeding_time: row.feeding_time,
+        grooming_time: row.grooming_time,
+        vet_visit_date: row.vet_visit_date
+      }));
+  
+      console.log('Pet schedules with pet name:', petSchedules);
       res.json({ petSchedules });
     }
   );
@@ -214,20 +206,6 @@ app.get('/api/pets', (req, res) => {
           res.json({ data: rows });
       }
   });
-});
-
-// Endpoint to get pet name by petId
-app.get('/pet/:petId', (req, res) => {
-  const petId = parseInt(req.params.petId); // Parse the petId from the URL
-  const pet = pets.find(pet => pet.id === petId); // Find the pet with the matching id
-
-  if (pet) {
-    // If pet is found, return the pet name
-    res.json({ name: pet.name });
-  } else {
-    // If pet is not found, return an error message
-    res.status(404).json({ error: 'Pet not found' });
-  }
 });
 
 // CRUD operations for Pets

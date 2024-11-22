@@ -36,9 +36,10 @@ const PetSchedulePage = () => {
         const allDates = Object.values(fetchedSchedules)
           .flat()
           .map((schedule) => [
+            schedule.pet_id,
             schedule.feeding_date,
             schedule.grooming_date,
-            schedule.vet_visit_date,
+            schedule.vet_visit_date
           ])
           .flat();
 
@@ -60,16 +61,16 @@ const PetSchedulePage = () => {
   // Filter schedules based on the selected date
   const filterSchedules = (selectedDate) => {
     const selectedDateString = selectedDate.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
-
+  
     // Filter schedules for feeding, grooming, or vet visits matching the selected date
-    const filteredSchedules = Object.values(schedules).flat().filter((schedule) => {
+    const filteredSchedules = schedules.filter((schedule) => {
       return (
-        schedule.feeding_date === selectedDateString ||
-        schedule.grooming_date === selectedDateString ||
-        schedule.vet_visit_date === selectedDateString
+        schedule.feeding_time?.startsWith(selectedDateString) ||
+        schedule.grooming_time?.startsWith(selectedDateString) ||
+        schedule.vet_visit_date?.startsWith(selectedDateString)
       );
     });
-
+  
     setSelectedSchedules(filteredSchedules);
   };
 
@@ -84,12 +85,6 @@ const PetSchedulePage = () => {
     return '';
   };
 
-  // Function to get the pet name by petId
-  const getPetNameById = (petId) => {
-    const pet = pets.find(pet => pet.name === petId);
-    return pet ? pet.name : 'Unknown Pet';
-  };
-
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <Header2 />
@@ -99,7 +94,7 @@ const PetSchedulePage = () => {
         <Calendar
           onChange={onDateChange}
           value={date}
-          tileClassName={tileClassName} // Use the tileClassName to highlight dates
+          tileClassName={tileClassName} // Highlight active dates
         />
       </div>
       <div style={{ marginTop: '20px' }}>
@@ -108,7 +103,7 @@ const PetSchedulePage = () => {
           <ul>
             {selectedSchedules.map((schedule, index) => (
               <li key={index}>
-                <strong>Pet Name:</strong> {getPetNameById(schedule.pet_id)} <br />
+                <strong>Pet Name:</strong> {schedule.pet_name} <br />
                 <strong>Feeding Time:</strong> {schedule.feeding_time} <br />
                 <strong>Grooming Time:</strong> {schedule.grooming_time} <br />
                 <strong>Vet Visit:</strong> {schedule.vet_visit_date}
