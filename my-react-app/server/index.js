@@ -399,6 +399,50 @@ app.post('/api/medical-records', (req, res) => {
   });
 });
 
+// Function to handle adding a new schedule for a specific pet
+app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
+  const { userId, petId } = req.params;
+  const { feeding_time, grooming_time, vet_visit_date } = req.body;
+
+  // Split datetime-local inputs into separate date and time values
+  const feedingDate = feeding_time ? feeding_time.split('T')[0] : null;
+  const feedingTime = feeding_time ? feeding_time.split('T')[1] : null;
+  const groomingDate = grooming_time ? grooming_time.split('T')[0] : null;
+  const groomingTime = grooming_time ? grooming_time.split('T')[1] : null;
+  const vetVisitDate = vet_visit_date ? vet_visit_date.split('T')[0] : null;
+
+  // Check if the pet exists and belongs to the specified user
+  db.get(`SELECT * FROM pets WHERE id = ? AND user_id = ?`, [petId, userId], (err, pet) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    if (!pet) {
+      return res.status(404).json({ error: 'Pet not found for this user' });
+    }
+
+    // Insert the new schedule into the database
+    const query = `
+      INSERT INTO schedules (pet_id, feeding_time, feeding_date, grooming_time, grooming_date, vet_visit_date) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.run(query, [petId, feedingTime, feedingDate, groomingTime, groomingDate, vetVisitDate], function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Error adding schedule' });
+      }
+      res.status(201).json({
+        message: 'Schedule added successfully',
+        scheduleId: this.lastID,
+        petId,
+        feedingTime,
+        feedingDate,
+        groomingTime,
+        groomingDate,
+        vetVisitDate,
+      });
+    });
+  });
+});
+
 app.get('/api/medical-records', (req, res) => {
   db.all(`SELECT * FROM medical_records`, [], (err, rows) => {
     if (err) {
