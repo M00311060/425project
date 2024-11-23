@@ -110,13 +110,39 @@ const PetSchedulePage = () => {
       .post(`/api/users/${userId}/pets/${selectedPetId}/schedules`, scheduleData)
       .then((response) => {
         console.log('Schedule added:', response.data);
+  
+        // Update schedules and activeDates states
+        axios
+          .get(`/api/users/${userId}/pets/schedules`)
+          .then((res) => {
+            const fetchedSchedules = res.data.petSchedules;
+            setSchedules(fetchedSchedules); // Update schedules
+  
+            // Extract active dates from fetched schedules
+            const allDates = Object.values(fetchedSchedules)
+              .flat()
+              .map((schedule) => [
+                schedule.feeding_time?.split('T')[0],
+                schedule.grooming_time?.split('T')[0],
+                schedule.vet_visit_date?.split('T')[0],
+              ])
+              .flat();
+  
+            const uniqueDates = [...new Set(allDates)];
+            setActiveDates(uniqueDates); // Update active dates
+  
+            filterSchedules(date); // Refresh the filtered schedule view
+          })
+          .catch((error) => {
+            console.error('Error fetching schedules:', error);
+          });
+  
         setShowModal(false); // Close modal after adding schedule
-        filterSchedules(date); // Refresh the filtered schedule view
       })
       .catch((error) => {
         console.error('Error adding schedule:', error);
       });
-  };
+  };  
   
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>

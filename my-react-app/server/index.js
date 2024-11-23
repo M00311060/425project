@@ -404,6 +404,11 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
   const { userId, petId } = req.params;
   const { feeding_time, grooming_time, vet_visit_date } = req.body;
 
+  // Ensure at least one schedule field is provided
+  if (!feeding_time && !grooming_time && !vet_visit_date) {
+    return res.status(400).json({ error: 'At least one schedule field is required' });
+  }
+
   // Split datetime-local inputs into separate date and time values
   const feedingDate = feeding_time ? feeding_time.split('T')[0] : null;
   const feedingTime = feeding_time ? feeding_time.split('T')[1] : null;
@@ -412,34 +417,39 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
   const vetVisitDate = vet_visit_date ? vet_visit_date.split('T')[0] : null;
 
   // Check if the pet exists and belongs to the specified user
-  db.get(`SELECT * FROM pets WHERE id = ? AND user_id = ?`, [petId, userId], (err, pet) => {
+  const queryCheckPet = `SELECT * FROM pets WHERE id = ? AND user_id = ?`;
+  db.get(queryCheckPet, [petId, userId], (err, pet) => {
     if (err) {
-      return res.status(500).json({ error: 'Database error' });
+      return res.status(500).json({ error: 'Database error while verifying pet' });
     }
     if (!pet) {
       return res.status(404).json({ error: 'Pet not found for this user' });
     }
 
     // Insert the new schedule into the database
-    const query = `
-      INSERT INTO schedules (pet_id, feeding_time, feeding_date, grooming_time, grooming_date, vet_visit_date) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+    const queryInsertSchedule = `
+      INSERT INTO schedules (pet_id, feeding_time, feeding_date, grooming_time, grooming_date, vet_visit_date)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
-    db.run(query, [petId, feedingTime, feedingDate, groomingTime, groomingDate, vetVisitDate], function (err) {
-      if (err) {
-        return res.status(500).json({ error: 'Error adding schedule' });
+    db.run(
+      queryInsertSchedule,
+      [petId, feedingTime, feedingDate, groomingTime, groomingDate, vetVisitDate],
+      function (err) {
+        if (err) {
+          return res.status(500).json({ error: 'Error adding schedule' });
+        }
+        res.status(201).json({
+          message: 'Schedule added successfully',
+          scheduleId: this.lastID,
+          petId,
+          feedingTime,
+          feedingDate,
+          groomingTime,
+          groomingDate,
+          vetVisitDate,
+        });
       }
-      res.status(201).json({
-        message: 'Schedule added successfully',
-        scheduleId: this.lastID,
-        petId,
-        feedingTime,
-        feedingDate,
-        groomingTime,
-        groomingDate,
-        vetVisitDate,
-      });
-    });
+    );
   });
 });
 
