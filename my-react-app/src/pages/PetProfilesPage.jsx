@@ -139,9 +139,39 @@ const PetProfilesPage = () => {
 
       <main className="main-content">
         <h2>Manage Your Pets</h2>
+        <div className="add-pet-form-container">
+        <form className="add-pet-form" onSubmit={handleAddOrUpdatePet}>
+          <label>
+            Pet Name:
+            <input type="text" name="name" value={form.name} onChange={handleInputChange} required />
+          </label>
+          <label>
+            Species:
+            <input type="text" name="species" value={form.species} onChange={handleInputChange} required />
+          </label>
+          <label>
+            Breed:
+            <input type="text" name="breed" value={form.breed} onChange={handleInputChange} required />
+          </label>
+          <label>
+            Feeding Schedule:
+            <input type="text" name="feeding_schedule" value={form.feeding_schedule} onChange={handleInputChange} required />
+          </label>
+          <label>
+            Medical History:
+            <input type="text" name="medical_history" value={form.medical_history} onChange={handleInputChange} required />
+          </label>
+          <label>
+            Care Needs:
+            <input type="text" name="care_needs" value={form.care_needs} onChange={handleInputChange} required />
+          </label>
+          <button type="submit">{isEditing ? 'Update Pet' : 'Add Pet'}</button>
+        </form>
+
         <button className="fetch-pets-button" onClick={handleFetchPets}>
           Show My Pets
         </button>
+        </div>
 
         {successMessage && <p className="success-message">{successMessage}</p>}
         {errorMessage && <p className="error-message">{errorMessage}</p>}
@@ -171,34 +201,6 @@ const PetProfilesPage = () => {
             <p>No pets found. Add a pet to get started!</p>
           )}
         </div>
-
-        <form className="add-pet-form" onSubmit={handleAddOrUpdatePet}>
-          <label>
-            Pet Name:
-            <input type="text" name="name" value={form.name} onChange={handleInputChange} required />
-          </label>
-          <label>
-            Species:
-            <input type="text" name="species" value={form.species} onChange={handleInputChange} required />
-          </label>
-          <label>
-            Breed:
-            <input type="text" name="breed" value={form.breed} onChange={handleInputChange} required />
-          </label>
-          <label>
-            Feeding Schedule:
-            <input type="text" name="feeding_schedule" value={form.feeding_schedule} onChange={handleInputChange} required />
-          </label>
-          <label>
-            Medical History:
-            <input type="text" name="medical_history" value={form.medical_history} onChange={handleInputChange} required />
-          </label>
-          <label>
-            Care Needs:
-            <input type="text" name="care_needs" value={form.care_needs} onChange={handleInputChange} required />
-          </label>
-          <button type="submit">{isEditing ? 'Update Pet' : 'Add Pet'}</button>
-        </form>
       </main>
 
       <Footer2 />

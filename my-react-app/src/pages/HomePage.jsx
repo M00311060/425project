@@ -23,7 +23,7 @@ const HomePage = () => {
             <li>Track Feeding, Grooming, and Vet Schedules</li>
             <li>Store Medical Records and Pet Information</li>
             <li>Receive Notifications and Reminders</li>
-            <li>Sync Schedules with Google Calendar</li>
+            <li>Sync Schedules a Calendar</li>
           </ul>
           <p>
             Join us in making pet management easier and more organized. Sign up today below!
