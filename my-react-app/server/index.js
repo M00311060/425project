@@ -275,6 +275,7 @@ app.put('/api/schedules/:id', (req, res) => {
     });
 });
 
+// Delete by vet visit date
 app.delete('/api/users/:userId/pets/schedules', (req, res) => {
   const { vet_visit_date } = req.body; // Ensure this is in the request body
 
@@ -374,9 +375,6 @@ app.post('/api/medical-records', (req, res) => {
 app.get('/api/users/:userId/pets/schedules', (req, res) => {
   const userId = req.params.userId;
 
-  // Log the userId to ensure it's correctly captured
-  console.log(`Fetching schedules for userId: ${userId}`);
-
   // Query to fetch all pets for the user, including the pet name
   db.all(
     `SELECT pets.id AS pet_id, pets.name AS pet_name, schedules.vet_visit_time, schedules.vet_visit_date
@@ -391,8 +389,6 @@ app.get('/api/users/:userId/pets/schedules', (req, res) => {
         return;
       }
   
-      console.log('Fetched rows:', rows);
-  
       if (rows.length === 0) {
         console.log('No schedules found for user:', userId);
         res.json({ petSchedules: [] });
@@ -405,8 +401,79 @@ app.get('/api/users/:userId/pets/schedules', (req, res) => {
         vet_visit_time: row.vet_visit_time,
         vet_visit_date: row.vet_visit_date
       }));
+
+      res.json({ petSchedules });
+    }
+  );
+});
+
+// Get feeding schedules for pets
+app.get('/api/users/:userId/pets/feeding_schedule', (req, res) => {
+  const userId = req.params.userId;
+
+  // Query to fetch all pets for the user, including the pet name
+  db.all(
+    `SELECT pets.id AS pet_id, pets.name AS pet_name, feeding_schedule.feeding_time, feeding_schedule.feeding_date
+     FROM pets
+     LEFT JOIN feeding_schedule ON pets.id = feeding_schedule.pet_id
+     WHERE pets.user_id = ?`,
+    [userId],
+    (err, rows) => {
+      if (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: err.message });
+        return;
+      }
   
-      console.log('Pet schedules with pet name:', petSchedules);
+      if (rows.length === 0) {
+        console.log('No schedules found for user:', userId);
+        res.json({ petSchedules: [] });
+        return;
+      }
+  
+      // Map rows into an array of schedule objects with pet name and other details
+      const petSchedules = rows.map((row) => ({
+        pet_name: row.pet_name, 
+        feeding_time: row.feeding_time,
+        feeding_date: row.feeding_date
+      }));
+  
+      res.json({ petSchedules });
+    }
+  );
+});
+
+// Get grooming schedules for pets
+app.get('/api/users/:userId/pets/grooming_schedule', (req, res) => {
+  const userId = req.params.userId;
+
+  // Query to fetch all pets for the user, including the pet name
+  db.all(
+    `SELECT pets.id AS pet_id, pets.name AS pet_name, grooming_schedule.grooming_time, grooming_schedule.grooming_date
+     FROM pets
+     LEFT JOIN grooming_schedule ON pets.id = grooming_schedule.pet_id
+     WHERE pets.user_id = ?`,
+    [userId],
+    (err, rows) => {
+      if (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: err.message });
+        return;
+      }
+  
+      if (rows.length === 0) {
+        console.log('No schedules found for user:', userId);
+        res.json({ petSchedules: [] });
+        return;
+      }
+  
+      // Map rows into an array of schedule objects with pet name and other details
+      const petSchedules = rows.map((row) => ({
+        pet_name: row.pet_name, 
+        grooming_time: row.grooming_time,
+        grooming_date: row.grooming_date
+      }));
+  
       res.json({ petSchedules });
     }
   );

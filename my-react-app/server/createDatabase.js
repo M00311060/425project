@@ -72,10 +72,39 @@ db.run(`CREATE TABLE IF NOT EXISTS schedules (
   if (err) {
     console.error('Error creating schedules table:', err.message);
   } else {
-    console.log('Schedules table created successfully with feeding_date and grooming_date');
+    console.log('Schedules table created successfully with vet visit time and date');
   }
 });
 
+// Create new feed Schedule table
+db.run(`CREATE TABLE IF NOT EXISTS feeding_schedule (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  pet_id INTEGER,
+  feeding_time TEXT,
+  feeding_date TEXT,
+  FOREIGN KEY (pet_id) REFERENCES pets(id)
+)`, (err) => {
+  if (err) {
+    console.error('Error creating feeding schedule table:', err.message);
+  } else {
+    console.log('Feeding schedule table created successfully with feeding time and date');
+  }
+});
+
+// Create new grooming Schedule table
+db.run(`CREATE TABLE IF NOT EXISTS grooming_schedule (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  pet_id INTEGER,
+  grooming_time TEXT,
+  grooming_date TEXT,
+  FOREIGN KEY (pet_id) REFERENCES pets(id)
+)`, (err) => {
+  if (err) {
+    console.error('Error creating grooming schedule table:', err.message);
+  } else {
+    console.log('Feeding schedule table created successfully with grooming time and date');
+  }
+});
 
   // Create Medical Records table
   db.run(`CREATE TABLE IF NOT EXISTS medical_records (
@@ -191,6 +220,72 @@ schedules.forEach(schedule => {
         console.error('Error inserting into schedules:', err.message);
       } else {
         console.log(`Inserted schedule with ID ${this.lastID}`);
+      }
+    });
+  });
+
+    // Insert data into Schedules table
+const feeding_schedule = [
+  [1, '04:00', '2024-12-10'],
+  [1, '03:30', '2024-11-20'],
+  [1, '04:00', '2024-12-02'],
+  [1, '09:00', '2024-11-29'],
+  [1, '04:30', '2024-12-03'],
+  [1, '07:00', '2024-12-06'],
+  [2, '06:00', '2024-12-05'],
+  [2, '12:00', '2024-12-08'],
+  [2, '11:30', '2024-12-15'],
+  [2, '04:15', '2024-12-20'],
+  [2, '09:00', '2024-11-30'],
+  [2, '07:45', '2024-12-09'],
+  [3, '06:00', '2024-11-23'],
+  [3, '04:00', '2024-12-03'],
+  [3, '07:30', '2024-12-07'],
+  [3, '10:00', '2024-11-22'],
+  [3, '06:30', '2024-12-12'],
+  [3, '04:30', '2024-12-01']
+];
+
+feeding_schedule.forEach(feeding_schedule => {
+  db.run(`INSERT INTO feeding_schedule (pet_id, feeding_time, feeding_date) VALUES (?, ?, ?)`,
+    feeding_schedule, function(err) {
+      if (err) {
+        console.error('Error inserting into feeding_schedule:', err.message);
+      } else {
+        console.log(`Inserted feeding_schedule with ID ${this.lastID}`);
+      }
+    });
+  });
+
+    // Insert data into Schedules table
+const grooming_schedule = [
+  [1, '04:00', '2024-12-10'],
+  [1, '05:30', '2024-11-20'],
+  [1, '10:00', '2024-12-02'],
+  [1, '11:00', '2024-11-29'],
+  [1, '12:30', '2024-12-03'],
+  [1, '11:00', '2024-12-06'],
+  [2, '08:00', '2024-12-05'],
+  [2, '03:00', '2024-12-08'],
+  [2, '06:30', '2024-12-15'],
+  [2, '07:15', '2024-12-20'],
+  [2, '09:00', '2024-11-30'],
+  [2, '10:45', '2024-12-09'],
+  [3, '11:00', '2024-11-23'],
+  [3, '06:00', '2024-12-03'],
+  [3, '05:30', '2024-12-07'],
+  [3, '04:00', '2024-11-22'],
+  [3, '04:30', '2024-12-12'],
+  [3, '08:30', '2024-12-01']
+];
+
+grooming_schedule.forEach(grooming_schedule => {
+  db.run(`INSERT INTO grooming_schedule (pet_id, grooming_time, grooming_date) VALUES (?, ?, ?)`,
+    grooming_schedule, function(err) {
+      if (err) {
+        console.error('Error inserting into grooming_schedule:', err.message);
+      } else {
+        console.log(`Inserted grooming_schedule with ID ${this.lastID}`);
       }
     });
   });
