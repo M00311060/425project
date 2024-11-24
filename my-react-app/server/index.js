@@ -147,48 +147,6 @@ app.get('/api/users/:userId/pets', (req, res) => {
   });
 });
 
-// Get schedules for pets
-app.get('/api/users/:userId/pets/schedules', (req, res) => {
-  const userId = req.params.userId;
-
-  // Log the userId to ensure it's correctly captured
-  console.log(`Fetching schedules for userId: ${userId}`);
-
-  // Query to fetch all pets for the user, including the pet name
-  db.all(
-    `SELECT pets.id AS pet_id, pets.name AS pet_name, schedules.vet_visit_time, schedules.vet_visit_date
-     FROM pets
-     LEFT JOIN schedules ON pets.id = schedules.pet_id
-     WHERE pets.user_id = ?`,
-    [userId],
-    (err, rows) => {
-      if (err) {
-        console.error('Database error:', err);
-        res.status(500).json({ error: err.message });
-        return;
-      }
-  
-      console.log('Fetched rows:', rows);
-  
-      if (rows.length === 0) {
-        console.log('No schedules found for user:', userId);
-        res.json({ petSchedules: [] });
-        return;
-      }
-  
-      // Map rows into an array of schedule objects with pet name and other details
-      const petSchedules = rows.map((row) => ({
-        pet_name: row.pet_name, 
-        vet_visit_time: row.vet_visit_time,
-        vet_visit_date: row.vet_visit_date
-      }));
-  
-      console.log('Pet schedules with pet name:', petSchedules);
-      res.json({ petSchedules });
-    }
-  );
-});
-
 // Get pets with owner info
 app.get('/api/pets', (req, res) => {
   const query = `
@@ -410,6 +368,48 @@ app.post('/api/medical-records', (req, res) => {
       res.status(201).json({ id: this.lastID });
     });
   });
+});
+
+// Get schedules for pets
+app.get('/api/users/:userId/pets/schedules', (req, res) => {
+  const userId = req.params.userId;
+
+  // Log the userId to ensure it's correctly captured
+  console.log(`Fetching schedules for userId: ${userId}`);
+
+  // Query to fetch all pets for the user, including the pet name
+  db.all(
+    `SELECT pets.id AS pet_id, pets.name AS pet_name, schedules.vet_visit_time, schedules.vet_visit_date
+     FROM pets
+     LEFT JOIN schedules ON pets.id = schedules.pet_id
+     WHERE pets.user_id = ?`,
+    [userId],
+    (err, rows) => {
+      if (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: err.message });
+        return;
+      }
+  
+      console.log('Fetched rows:', rows);
+  
+      if (rows.length === 0) {
+        console.log('No schedules found for user:', userId);
+        res.json({ petSchedules: [] });
+        return;
+      }
+  
+      // Map rows into an array of schedule objects with pet name and other details
+      const petSchedules = rows.map((row) => ({
+        pet_name: row.pet_name, 
+        vet_visit_time: row.vet_visit_time,
+        vet_visit_date: row.vet_visit_date
+      }));
+  
+      console.log('Pet schedules with pet name:', petSchedules);
+      res.json({ petSchedules });
+    }
+  );
 });
 
 // Function to handle adding a new schedule for a specific pet
