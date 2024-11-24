@@ -14,8 +14,7 @@ const PetSchedulePage = () => {
   const [pets, setPets] = useState([]);
   const [showModal, setShowModal] = useState(false); // Modal visibility
   const [newSchedule, setNewSchedule] = useState({
-    feeding_time: '',
-    grooming_time: '',
+    vet_visit_time: '',
     vet_visit_date: '',
   });
   const [selectedPetId, setSelectedPetId] = useState(null); // Selected pet ID
@@ -44,9 +43,7 @@ const PetSchedulePage = () => {
         const allDates = Object.values(fetchedSchedules)
           .flat()
           .map((schedule) => [
-            schedule.pet_id,
-            schedule.feeding_date,
-            schedule.grooming_date,
+            schedule.vet_visit_time,
             schedule.vet_visit_date,
           ])
           .flat();
@@ -73,8 +70,7 @@ const PetSchedulePage = () => {
     // Filter schedules for feeding, grooming, or vet visits matching the selected date
     const filteredSchedules = schedules.filter((schedule) => {
       return (
-        schedule.feeding_time?.startsWith(selectedDateString) ||
-        schedule.grooming_time?.startsWith(selectedDateString) ||
+        schedule.vet_visit_time?.startsWith(selectedDateString)||
         schedule.vet_visit_date?.startsWith(selectedDateString)
       );
     });
@@ -101,8 +97,7 @@ const PetSchedulePage = () => {
     }
   
     const scheduleData = {
-      feeding_time: newSchedule.feeding_time,
-      grooming_time: newSchedule.grooming_time,
+      vet_visit_time: newSchedule.vet_visit_time,
       vet_visit_date: newSchedule.vet_visit_date,
     };
   
@@ -122,8 +117,7 @@ const PetSchedulePage = () => {
             const allDates = Object.values(fetchedSchedules)
               .flat()
               .map((schedule) => [
-                schedule.feeding_time?.split('T')[0],
-                schedule.grooming_time?.split('T')[0],
+                schedule.vet_visit_time?.split('T')[0],
                 schedule.vet_visit_date?.split('T')[0],
               ])
               .flat();
@@ -159,8 +153,7 @@ const PetSchedulePage = () => {
         // Extract new active dates after deletion
         const allDates = updatedSchedules
           .flatMap((schedule) => [
-            schedule.feeding_time?.split('T')[0],
-            schedule.grooming_time?.split('T')[0],
+            schedule.vet_visit_time?.split('T')[0],
             schedule.vet_visit_date?.split('T')[0],
           ])
           .filter(Boolean); // Remove undefined or null values
@@ -203,8 +196,7 @@ const PetSchedulePage = () => {
      {selectedSchedules.map((schedule, index) => (
        <li key={index}>
          <strong>Pet Name:</strong> {schedule.pet_name} <br />
-         <strong>Feeding Time:</strong> {schedule.feeding_time} <br />
-         <strong>Grooming Time:</strong> {schedule.grooming_time} <br />
+         <strong>Vet Time:</strong> {schedule.vet_visit_time} <br />
          <strong>Vet Visit:</strong> {schedule.vet_visit_date} <br />
          <button className="delete-button" onClick={() => deleteSchedule(schedule.vet_visit_date)}>Delete</button>
        </li>
@@ -235,19 +227,11 @@ const PetSchedulePage = () => {
                 ))}
               </select>
               <div>
-                <label>Feeding Time:</label>
+                <label>Vet Time:</label>
                 <input
                   type="datetime-local"
-                  onChange={(e) => setNewSchedule({ ...newSchedule, feeding_time: e.target.value })}
-                  value={newSchedule.feeding_time}
-                />
-              </div>
-              <div>
-                <label>Grooming Time:</label>
-                <input
-                  type="datetime-local"
-                  onChange={(e) => setNewSchedule({ ...newSchedule, grooming_time: e.target.value })}
-                  value={newSchedule.grooming_time}
+                  onChange={(e) => setNewSchedule({ ...newSchedule, vet_visit_time: e.target.value })}
+                  value={newSchedule.vet_visit_time}
                 />
               </div>
               <div>

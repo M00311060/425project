@@ -156,7 +156,7 @@ app.get('/api/users/:userId/pets/schedules', (req, res) => {
 
   // Query to fetch all pets for the user, including the pet name
   db.all(
-    `SELECT pets.id AS pet_id, pets.name AS pet_name, schedules.feeding_time, schedules.grooming_time, schedules.vet_visit_date
+    `SELECT pets.id AS pet_id, pets.name AS pet_name, schedules.vet_visit_time, schedules.vet_visit_date
      FROM pets
      LEFT JOIN schedules ON pets.id = schedules.pet_id
      WHERE pets.user_id = ?`,
@@ -179,8 +179,7 @@ app.get('/api/users/:userId/pets/schedules', (req, res) => {
       // Map rows into an array of schedule objects with pet name and other details
       const petSchedules = rows.map((row) => ({
         pet_name: row.pet_name, 
-        feeding_time: row.feeding_time,
-        grooming_time: row.grooming_time,
+        vet_visit_time: row.vet_visit_time,
         vet_visit_date: row.vet_visit_date
       }));
   
@@ -271,9 +270,9 @@ app.delete('/api/pets/:id', (req, res) => {
 
 // CRUD operations for Schedules
 app.post('/api/schedules', (req, res) => {
-  const { pet_id, feeding_time, grooming_time, vet_visit_date } = req.body;
-  db.run(`INSERT INTO schedules (pet_id, feeding_time, grooming_time, vet_visit_date) VALUES (?, ?, ?, ?)`, 
-    [pet_id, feeding_time, grooming_time, vet_visit_date], function (err) {
+  const { pet_id, vet_visit_time, vet_visit_date } = req.body;
+  db.run(`INSERT INTO schedules (pet_id, vet_visit_time, vet_visit_date) VALUES (?, ?, ?)`, 
+    [pet_id, vet_visit_time, vet_visit_date], function (err) {
       if (err) {
         res.status(404).json({ error: err.message });
         return;
@@ -307,9 +306,9 @@ app.get('/api/schedules/:id', (req, res) => {
 // Update a schedule by ID
 app.put('/api/schedules/:id', (req, res) => {
   const { id } = req.params;
-  const { pet_id, feeding_time, grooming_time, vet_visit_date } = req.body;
-  db.run(`UPDATE schedules SET pet_id = ?, feeding_time = ?, grooming_time = ?, vet_visit_date = ? WHERE id = ?`, 
-    [pet_id, feeding_time, grooming_time, vet_visit_date, id], function (err) {
+  const { pet_id, vet_visit_time, vet_visit_date } = req.body;
+  db.run(`UPDATE schedules SET pet_id = ?, vet_visit_time = ?, vet_visit_date = ? WHERE id = ?`, 
+    [pet_id, vet_visit_time, vet_visit_date, id], function (err) {
       if (err) {
         res.status(404).json({ error: err.message });
         return;
@@ -416,18 +415,15 @@ app.post('/api/medical-records', (req, res) => {
 // Function to handle adding a new schedule for a specific pet
 app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
   const { userId, petId } = req.params;
-  const { feeding_time, grooming_time, vet_visit_date } = req.body;
+  const { vet_visit_time, vet_visit_date } = req.body;
 
   // Ensure at least one schedule field is provided
-  if (!feeding_time && !grooming_time && !vet_visit_date) {
+  if (!vet_visit_time && !vet_visit_date) {
     return res.status(400).json({ error: 'At least one schedule field is required' });
   }
 
   // Split datetime-local inputs into separate date and time values
-  const feedingDate = feeding_time ? feeding_time.split('T')[0] : null;
-  const feedingTime = feeding_time ? feeding_time.split('T')[1] : null;
-  const groomingDate = grooming_time ? grooming_time.split('T')[0] : null;
-  const groomingTime = grooming_time ? grooming_time.split('T')[1] : null;
+  const vetvisittime = vet_visit_time ? vet_visit_time.split('T')[1] : null;
   const vetVisitDate = vet_visit_date ? vet_visit_date.split('T')[0] : null;
 
   // Check if the pet exists and belongs to the specified user
@@ -442,12 +438,12 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
 
     // Insert the new schedule into the database
     const queryInsertSchedule = `
-      INSERT INTO schedules (pet_id, feeding_time, feeding_date, grooming_time, grooming_date, vet_visit_date)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO schedules (pet_id, vet_visit_time, vet_visit_date)
+      VALUES (?, ?, ?)
     `;
     db.run(
       queryInsertSchedule,
-      [petId, feedingTime, feedingDate, groomingTime, groomingDate, vetVisitDate],
+      [petId, vetvisittime, vetVisitDate],
       function (err) {
         if (err) {
           return res.status(500).json({ error: 'Error adding schedule' });
@@ -456,10 +452,7 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
           message: 'Schedule added successfully',
           scheduleId: this.lastID,
           petId,
-          feedingTime,
-          feedingDate,
-          groomingTime,
-          groomingDate,
+          vetVisitDate,
           vetVisitDate,
         });
       }
