@@ -229,7 +229,7 @@ const PetSchedulePage = () => {
               <div>
                 <label>Vet Time:</label>
                 <input
-                  type="datetime-local"
+                  type="time"
                   onChange={(e) => setNewSchedule({ ...newSchedule, vet_visit_time: e.target.value })}
                   value={newSchedule.vet_visit_time}
                 />
@@ -237,7 +237,7 @@ const PetSchedulePage = () => {
               <div>
                 <label>Vet Visit Date:</label>
                 <input
-                  type="datetime-local"
+                  type="date"
                   onChange={(e) => setNewSchedule({ ...newSchedule, vet_visit_date: e.target.value })}
                   value={newSchedule.vet_visit_date}
                 />

@@ -422,9 +422,9 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
     return res.status(400).json({ error: 'At least one schedule field is required' });
   }
 
-  // Split datetime-local inputs into separate date and time values
-  const vetvisittime = vet_visit_time ? vet_visit_time.split('T')[1] : null;
-  const vetVisitDate = vet_visit_date ? vet_visit_date.split('T')[0] : null;
+  // Use the time and date directly (no need to split)
+  const vetvisittime = vet_visit_time || null;  // Default to null if vet_visit_time is empty
+  const vetVisitDate = vet_visit_date || null;  // Default to null if vet_visit_date is empty
 
   // Check if the pet exists and belongs to the specified user
   const queryCheckPet = `SELECT * FROM pets WHERE id = ? AND user_id = ?`;
@@ -441,22 +441,18 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
       INSERT INTO schedules (pet_id, vet_visit_time, vet_visit_date)
       VALUES (?, ?, ?)
     `;
-    db.run(
-      queryInsertSchedule,
-      [petId, vetvisittime, vetVisitDate],
-      function (err) {
-        if (err) {
-          return res.status(500).json({ error: 'Error adding schedule' });
-        }
-        res.status(201).json({
-          message: 'Schedule added successfully',
-          scheduleId: this.lastID,
-          petId,
-          vetVisitDate,
-          vetVisitDate,
-        });
+    db.run(queryInsertSchedule, [petId, vetvisittime, vetVisitDate], function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Error adding schedule' });
       }
-    );
+      res.status(201).json({
+        message: 'Schedule added successfully',
+        scheduleId: this.lastID,
+        petId,
+        vetVisitDate,
+        vetvisittime, // Return the exact values
+      });
+    });
   });
 });
 
