@@ -318,16 +318,30 @@ app.put('/api/schedules/:id', (req, res) => {
     });
 });
 
-// Delete a schedule by ID
-app.delete('/api/schedules/:id', (req, res) => {
-  const { id } = req.params;
-  db.run(`DELETE FROM schedules WHERE id = ?`, [id], function (err) {
-    if (err) {
-      res.status(404).json({ error: err.message });
-      return;
+app.delete('/api/users/:userId/pets/schedules', (req, res) => {
+  const { vet_visit_date } = req.body; // Ensure this is in the request body
+
+  if (!vet_visit_date) {
+    return res.status(400).send('vet_visit_date is required');
+  }
+
+  // Query the database to delete the schedule
+  db.run(
+    `DELETE FROM schedules WHERE vet_visit_date = ?`,
+    [vet_visit_date],
+    function (err) {
+      if (err) {
+        console.error('Database error:', err.message);
+        return res.status(500).send('Error deleting schedule');
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).send('No schedules found for the specified vet_visit_date and user');
+      }
+
+      res.status(200).send({ message: 'Schedule deleted successfully' });
     }
-    res.json({ deletedID: id });
-  });
+  );
 });
 
 // Get all medical records for the logged-in user

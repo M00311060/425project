@@ -143,6 +143,44 @@ const PetSchedulePage = () => {
         console.error('Error adding schedule:', error);
       });
   };  
+
+  const deleteSchedule = (vetVisitDate) => {
+    axios
+      .delete(`/api/users/${userId}/pets/schedules`, { data: { vet_visit_date: vetVisitDate } })
+      .then((response) => {
+        alert('Schedule deleted successfully!');
+  
+        // Update schedules state by filtering out the deleted schedule
+        const updatedSchedules = schedules.filter(
+          (schedule) => schedule.vet_visit_date !== vetVisitDate
+        );
+        setSchedules(updatedSchedules);
+  
+        // Extract new active dates after deletion
+        const allDates = updatedSchedules
+          .flatMap((schedule) => [
+            schedule.feeding_time?.split('T')[0],
+            schedule.grooming_time?.split('T')[0],
+            schedule.vet_visit_date?.split('T')[0],
+          ])
+          .filter(Boolean); // Remove undefined or null values
+  
+        const uniqueDates = [...new Set(allDates)];
+        setActiveDates(uniqueDates); // Update active dates to refresh the calendar
+  
+        // Clear selected schedules immediately after deletion
+        setSelectedSchedules((prevSelectedSchedules) =>
+          prevSelectedSchedules.filter((schedule) => schedule.vet_visit_date !== vetVisitDate)
+        );
+  
+        // Refresh filtered schedules for the currently selected date
+        filterSchedules(date);
+      })
+      .catch((error) => {
+        alert('Failed to delete schedule. Please try again.');
+        console.error('Error deleting schedule:', error.response?.data || error.message);
+      });
+  };  
   
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -158,19 +196,20 @@ const PetSchedulePage = () => {
         />
       </div>
 
-      <div style={{ marginTop: '20px' }}>
-        <h2>Selected Date: {date.toDateString()}</h2>
-        {selectedSchedules.length > 0 ? (
-          <ul>
-            {selectedSchedules.map((schedule, index) => (
-              <li key={index}>
-                <strong>Pet Name:</strong> {schedule.pet_name} <br />
-                <strong>Feeding Time:</strong> {schedule.feeding_time} <br />
-                <strong>Grooming Time:</strong> {schedule.grooming_time} <br />
-                <strong>Vet Visit:</strong> {schedule.vet_visit_date}
-              </li>
-            ))}
-          </ul>
+      <div>
+    {/* Selected schedules */}
+    {selectedSchedules.length > 0 ? (
+     <ul>
+     {selectedSchedules.map((schedule, index) => (
+       <li key={index}>
+         <strong>Pet Name:</strong> {schedule.pet_name} <br />
+         <strong>Feeding Time:</strong> {schedule.feeding_time} <br />
+         <strong>Grooming Time:</strong> {schedule.grooming_time} <br />
+         <strong>Vet Visit:</strong> {schedule.vet_visit_date} <br />
+         <button className="delete-button" onClick={() => deleteSchedule(schedule.vet_visit_date)}>Delete</button>
+       </li>
+     ))}
+    </ul>
         ) : (
           <p>No activities scheduled for this date.</p>
         )}
