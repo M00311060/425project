@@ -275,102 +275,6 @@ app.put('/api/schedules/:id', (req, res) => {
     });
 });
 
-// Delete by vet visit date
-app.delete('/api/users/:userId/pets/schedules', (req, res) => {
-  const { vet_visit_date } = req.body; // Ensure this is in the request body
-
-  if (!vet_visit_date) {
-    return res.status(400).send('vet_visit_date is required');
-  }
-
-  // Query the database to delete the schedule
-  db.run(
-    `DELETE FROM schedules WHERE vet_visit_date = ?`,
-    [vet_visit_date],
-    function (err) {
-      if (err) {
-        console.error('Database error:', err.message);
-        return res.status(500).send('Error deleting schedule');
-      }
-
-      if (this.changes === 0) {
-        return res.status(404).send('No schedules found for the specified vet_visit_date and user');
-      }
-
-      res.status(200).send({ message: 'Schedule deleted successfully' });
-    }
-  );
-});
-
-// Get all medical records for the logged-in user
-app.get('/api/medical-records/user/:userId', (req, res) => {
-  const { userId } = req.params;
-  
-  const query = `
-    SELECT 
-      medical_records.id AS record_id,
-      pets.name AS pet_name,
-      medical_records.record AS record
-    FROM 
-      medical_records
-    JOIN 
-      pets ON pets.id = medical_records.pet_id
-    JOIN 
-      users ON users.id = pets.user_id
-    WHERE 
-      users.id = ?
-  `;
-  
-  db.all(query, [userId], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ data: rows });
-  });
-});
-
-// Add a new medical record using pet name
-app.post('/api/medical-records', (req, res) => {
-  const { userId, pet_name, record } = req.body;
-
-  // Query to find the pet_id based on pet_name and userId
-  const getPetIdQuery = `
-    SELECT pets.id AS pet_id 
-    FROM pets
-    JOIN users ON users.id = pets.user_id
-    WHERE pets.name = ? AND users.id = ?
-  `;
-
-  db.get(getPetIdQuery, [pet_name, userId], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: `Error finding pet: ${err.message}` });
-      return;
-    }
-    
-    if (!row) {
-      res.status(404).json({ error: 'Pet not found for this user.' });
-      return;
-    }
-
-    const pet_id = row.pet_id;
-
-    // Insert the new medical record with the retrieved pet_id
-    const insertRecordQuery = `
-      INSERT INTO medical_records (pet_id, record)
-      VALUES (?, ?)
-    `;
-
-    db.run(insertRecordQuery, [pet_id, record], function (err) {
-      if (err) {
-        res.status(500).json({ error: `Error adding medical record: ${err.message}` });
-        return;
-      }
-      res.status(201).json({ id: this.lastID });
-    });
-  });
-});
-
 // Get schedules for pets
 app.get('/api/users/:userId/pets/schedules', (req, res) => {
   const userId = req.params.userId;
@@ -516,9 +420,246 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
         message: 'Schedule added successfully',
         scheduleId: this.lastID,
         petId,
-        vetVisitDate,
-        vetvisittime, // Return the exact values
+        vetvisittime,
+        vetVisitDate, // Return the exact values
       });
+    });
+  });
+});
+
+// Function to handle adding a new feeding schedule for a specific pet
+app.post('/api/users/:userId/pets/:petId/feeding_schedule', (req, res) => {
+  const { userId, petId } = req.params;
+  const { feeding_time, feeding_date } = req.body;
+
+  // Ensure at least one schedule field is provided
+  if (!feeding_time && !feeding_date) {
+    return res.status(400).json({ error: 'At least one schedule field is required' });
+  }
+
+  // Use the time and date directly (no need to split)
+  const feedingtime = feeding_time || null;  
+  const feedingdate = feeding_date || null;  
+
+  // Check if the pet exists and belongs to the specified user
+  const queryCheckPet = `SELECT * FROM pets WHERE id = ? AND user_id = ?`;
+  db.get(queryCheckPet, [petId, userId], (err, pet) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error while verifying pet' });
+    }
+    if (!pet) {
+      return res.status(404).json({ error: 'Pet not found for this user' });
+    }
+
+    // Insert the new schedule into the database
+    const queryInsertSchedule = `
+      INSERT INTO feeding_schedule (pet_id, feeding_time, feeding_date)
+      VALUES (?, ?, ?)
+    `;
+    db.run(queryInsertSchedule, [petId, feedingtime, feedingdate], function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Error adding schedule' });
+      }
+      res.status(201).json({
+        message: 'Schedule added successfully',
+        scheduleId: this.lastID,
+        petId,
+        feedingtime,
+        feedingdate, // Return the exact values
+      });
+    });
+  });
+});
+
+// Function to handle adding a new grooming schedule for a specific pet
+app.post('/api/users/:userId/pets/:petId/grooming_schedule', (req, res) => {
+  const { userId, petId } = req.params;
+  const { grooming_time, grooming_date } = req.body;
+
+  // Ensure at least one schedule field is provided
+  if (!grooming_time && !grooming_date) {
+    return res.status(400).json({ error: 'At least one schedule field is required' });
+  }
+
+  // Use the time and date directly (no need to split)
+  const groomingtime = grooming_time || null;  
+  const groomingdate = grooming_date || null;  
+
+  // Check if the pet exists and belongs to the specified user
+  const queryCheckPet = `SELECT * FROM pets WHERE id = ? AND user_id = ?`;
+  db.get(queryCheckPet, [petId, userId], (err, pet) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error while verifying pet' });
+    }
+    if (!pet) {
+      return res.status(404).json({ error: 'Pet not found for this user' });
+    }
+
+    // Insert the new schedule into the database
+    const queryInsertSchedule = `
+      INSERT INTO grooming_schedule (pet_id, grooming_time, grooming_date)
+      VALUES (?, ?, ?)
+    `;
+    db.run(queryInsertSchedule, [petId, groomingtime, groomingdate], function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Error adding schedule' });
+      }
+      res.status(201).json({
+        message: 'Schedule added successfully',
+        scheduleId: this.lastID,
+        petId,
+        groomingtime,
+        groomingdate, // Return the exact values
+      });
+    });
+  });
+});
+
+// Delete by vet visit date
+app.delete('/api/users/:userId/pets/schedules', (req, res) => {
+  const { vet_visit_date } = req.body; // Ensure this is in the request body
+
+  if (!vet_visit_date) {
+    return res.status(400).send('vet_visit_date is required');
+  }
+
+  // Query the database to delete the schedule
+  db.run(
+    `DELETE FROM schedules WHERE vet_visit_date = ?`,
+    [vet_visit_date],
+    function (err) {
+      if (err) {
+        console.error('Database error:', err.message);
+        return res.status(500).send('Error deleting schedule');
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).send('No schedules found for the specified vet_visit_date and user');
+      }
+
+      res.status(200).send({ message: 'Schedule deleted successfully' });
+    }
+  );
+});
+
+// Delete by feeding date
+app.delete('/api/users/:userId/pets/feeding_schedule', (req, res) => {
+  const { feeding_date } = req.query; // Use query parameters
+
+  if (!feeding_date) {
+    return res.status(400).send('feeding_date is required');
+  }
+
+  db.run(
+    `DELETE FROM feeding_schedule WHERE feeding_date = ?`,
+    [feeding_date],
+    function (err) {
+      if (err) {
+        console.error('Database error:', err.message);
+        return res.status(500).send('Error deleting schedule');
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).send('No schedules found for the specified feeding_date and user');
+      }
+
+      res.status(200).send({ message: 'Feeding schedule deleted successfully' });
+    }
+  );
+});
+
+// Delete by grooming date
+app.delete('/api/users/:userId/pets/grooming_schedule', (req, res) => {
+  const { grooming_date } = req.body; // Ensure this is in the request body
+
+  if (!grooming_date) {
+    return res.status(400).send('grooming date is required');
+  }
+
+  // Query the database to delete the schedule
+  db.run(
+    `DELETE FROM grooming_schedule WHERE grooming_date = ?`,
+    [grooming_date],
+    function (err) {
+      if (err) {
+        console.error('Database error:', err.message);
+        return res.status(500).send('Error deleting schedule');
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).send('No schedules found for the specified grooming_date and user');
+      }
+
+      res.status(200).send({ message: 'Schedule deleted successfully' });
+    }
+  );
+});
+
+// Get all medical records for the logged-in user
+app.get('/api/medical-records/user/:userId', (req, res) => {
+  const { userId } = req.params;
+  
+  const query = `
+    SELECT 
+      medical_records.id AS record_id,
+      pets.name AS pet_name,
+      medical_records.record AS record
+    FROM 
+      medical_records
+    JOIN 
+      pets ON pets.id = medical_records.pet_id
+    JOIN 
+      users ON users.id = pets.user_id
+    WHERE 
+      users.id = ?
+  `;
+  
+  db.all(query, [userId], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
+});
+
+// Add a new medical record using pet name
+app.post('/api/medical-records', (req, res) => {
+  const { userId, pet_name, record } = req.body;
+
+  // Query to find the pet_id based on pet_name and userId
+  const getPetIdQuery = `
+    SELECT pets.id AS pet_id 
+    FROM pets
+    JOIN users ON users.id = pets.user_id
+    WHERE pets.name = ? AND users.id = ?
+  `;
+
+  db.get(getPetIdQuery, [pet_name, userId], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: `Error finding pet: ${err.message}` });
+      return;
+    }
+    
+    if (!row) {
+      res.status(404).json({ error: 'Pet not found for this user.' });
+      return;
+    }
+
+    const pet_id = row.pet_id;
+
+    // Insert the new medical record with the retrieved pet_id
+    const insertRecordQuery = `
+      INSERT INTO medical_records (pet_id, record)
+      VALUES (?, ?)
+    `;
+
+    db.run(insertRecordQuery, [pet_id, record], function (err) {
+      if (err) {
+        res.status(500).json({ error: `Error adding medical record: ${err.message}` });
+        return;
+      }
+      res.status(201).json({ id: this.lastID });
     });
   });
 });

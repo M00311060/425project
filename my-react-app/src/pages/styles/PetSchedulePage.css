@@ -48,8 +48,8 @@ body {
   }
   
   .button-add {
-    padding: 10px 20px;
-    font-size: 1.1rem;
+    padding: 8px 16px;
+    font-size: 1rem;
     color: white;
     background-color: #007bff;
     border: none;
@@ -63,8 +63,8 @@ body {
   }
 
   .button-save {
-    padding: 10px 20px;
-    font-size: 1.1rem;
+    padding: 8px 16px;
+    font-size: 1rem;
     color: white;
     background-color: #007bff;
     border: none;
@@ -78,8 +78,8 @@ body {
   }
 
   .button-cancel {
-    padding: 10px 20px;
-    font-size: 1.1rem;
+    padding: 8px 16px;
+    font-size: 1rem;
     color: white;
     background-color: #dc3545;
     border: none;
@@ -93,8 +93,8 @@ body {
   }
 
   .delete-button{
-    padding: 10px 20px;
-    font-size: 1.1rem;
+    padding: 8px 16px;
+    font-size: 1rem;
     color: white;
     background-color: #dc3545;
     border: none;

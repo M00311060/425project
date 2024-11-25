@@ -14,10 +14,20 @@ const PetSchedulePage = () => {
   const [selectedSchedules, setSelectedSchedules] = useState([]);
   const [activeDates, setActiveDates] = useState([]);
   const [pets, setPets] = useState([]);
-  const [showModal, setShowModal] = useState(false); // Modal visibility
+  const [showModal, setShowModal] = useState(false); // Vet Modal
+  const [showFeedingModal, setShowFeedingModal] = useState(false);  // Feeding Modal
+  const [showGroomingModal, setShowGroomingModal] = useState(false); // Grooming Modal
   const [newSchedule, setNewSchedule] = useState({
     vet_visit_time: '',
     vet_visit_date: '',
+  });
+  const [newFeedingSchedule, setNewFeedingSchedule] = useState({
+    feeding_time: '',
+    feeding_date: '',
+  });
+  const [newGroomingSchedule, setNewGroomingSchedule] = useState({
+    grooming_time: '',
+    grooming_date: '',
   });
   const [selectedPetId, setSelectedPetId] = useState(null); // Selected pet ID
   const userId = JSON.parse(localStorage.getItem('user'))?.id;
@@ -146,7 +156,6 @@ const PetSchedulePage = () => {
     axios
       .post(`/api/users/${userId}/pets/${selectedPetId}/schedules`, scheduleData)
       .then((response) => {
-        console.log('Schedule added:', response.data);
   
         // Update schedules and activeDates states
         axios
@@ -180,6 +189,114 @@ const PetSchedulePage = () => {
       });
   };
 
+  // add to feeding schedule
+  const addFeedingSchedule = () => {
+    if (!selectedPetId) {
+      alert('Please select a pet.');
+      return;
+    }
+
+    const scheduleData = {
+      feeding_time: newFeedingSchedule.feeding_time,
+      feeding_date: newFeedingSchedule.feeding_date,
+    };
+
+    axios
+      .post(`/api/users/${userId}/pets/${selectedPetId}/feeding_schedule`, scheduleData)
+      .then((response) => {
+        console.log('Feeding schedule added:', response.data);
+        // Update the schedules and activeDates states
+        setFeedingSchedules((prevSchedules) => [
+          ...prevSchedules,
+          response.data,
+        ]);
+        setShowFeedingModal(false);
+      })
+      .catch((error) => {
+        console.error('Error adding feeding schedule:', error);
+      });
+  };
+
+  // add to grooming schedule
+  const addGroomingSchedule = () => {
+    if (!selectedPetId) {
+      alert('Please select a pet.');
+      return;
+    }
+
+    const scheduleData = {
+      grooming_time: newGroomingSchedule.grooming_time,
+      grooming_date: newGroomingSchedule.grooming_date,
+    };
+
+    axios
+      .post(`/api/users/${userId}/pets/${selectedPetId}/grooming_schedule`, scheduleData)
+      .then((response) => {
+        console.log('Grooming schedule added:', response.data);
+        setGroomingSchedules((prevSchedules) => [
+          ...prevSchedules,
+          response.data,
+        ]);
+        setShowGroomingModal(false);
+      })
+      .catch((error) => {
+        console.error('Error adding grooming schedule:', error);
+      });
+  };
+
+  // Function to delete vet schedule by date
+const deleteVetSchedule = (vet_visit_date) => {
+  axios
+    .delete(`/api/users/${userId}/pets/schedules`, { data: { vet_visit_date } })
+    .then(() => {
+      setVetSchedules((prevSchedules) =>
+        prevSchedules.filter((schedule) => schedule.vet_visit_date !== vet_visit_date)
+      );
+      setActiveDates((prevDates) =>
+        prevDates.filter((date) => date !== vet_visit_date)
+      );
+      alert('Vet schedule deleted successfully.');
+    })
+    .catch((error) => {
+      console.error('Error deleting vet schedule:', error);
+    });
+};
+
+// Function to delete feeding schedule by date
+const deleteFeedingSchedule = (feeding_date) => {
+  axios
+    .delete(`/api/users/${userId}/pets/feeding_schedule?feeding_date=${feeding_date}`)
+    .then(() => {
+      setFeedingSchedules((prevSchedules) =>
+        prevSchedules.filter((schedule) => schedule.feeding_date !== feeding_date)
+      );
+      alert('Feeding schedule deleted successfully.');
+    })
+    .catch((error) => {
+      console.error('Error deleting feeding schedule:', error.response || error.message);
+      alert('An error occurred while deleting the feeding schedule.');
+    });
+};
+
+// Function to delete grooming schedule by date
+const deleteGroomingSchedule = (grooming_date) => {
+  axios
+    .delete(`/api/users/${userId}/pets/grooming_schedule`, { data: { grooming_date } })
+    .then(() => {
+      setGroomingSchedules((prevSchedules) =>
+        prevSchedules.filter((schedule) => schedule.grooming_date !== grooming_date)
+      );
+      setActiveDates((prevDates) =>
+        prevDates.filter((date) => date !== grooming_date)
+      );
+      alert('Grooming schedule deleted successfully.');
+    })
+    .catch((error) => {
+      console.error('Error deleting grooming schedule:', error);
+      alert('An error occurred while deleting the grooming schedule.');
+    });
+};
+
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <Header2 />
@@ -205,23 +322,29 @@ const PetSchedulePage = () => {
                   <>
                     <strong>Vet Time:</strong> {schedule.vet_visit_time} <br />
                     <strong>Vet Visit:</strong> {schedule.vet_visit_date} <br />
+                    <button className="delete-button" onClick={() => deleteVetSchedule(schedule.vet_visit_date)}>
+                      Delete
+                    </button>
                   </>
                 )}
                 {schedule.feeding_time && (
                   <>
                     <strong>Feeding Time:</strong> {schedule.feeding_time} <br />
                     <strong>Feeding Date:</strong> {schedule.feeding_date} <br />
+                    <button className="delete-button" onClick={() => deleteFeedingSchedule(schedule.feeding_date)}>
+                      Delete
+                    </button>
                   </>
                 )}
                 {schedule.grooming_time && (
                   <>
                     <strong>Grooming Time:</strong> {schedule.grooming_time} <br />
                     <strong>Grooming Date:</strong> {schedule.grooming_date} <br />
+                    <button className="delete-button" onClick={() => deleteGroomingSchedule(schedule.grooming_date)}>
+                      Delete
+                    </button>
                   </>
                 )}
-                <button className="delete-button" onClick={() => deleteSchedule(schedule.vet_visit_date)}>
-                  Delete
-                </button>
               </li>
             ))}
           </ul>
@@ -230,14 +353,20 @@ const PetSchedulePage = () => {
         )}
 
         <button className="button-add" onClick={() => setShowModal(true)}>
-          Add Schedule
+          Add Vet Visit Schedule
+        </button>
+        <button className="button-add" onClick={() => setShowFeedingModal(true)}>
+          Add Feeding Schedule
+        </button>
+        <button className="button-add" onClick={() => setShowGroomingModal(true)}>
+          Add Grooming Schedule
         </button>
 
         {/* Modal for adding a new schedule */}
         {showModal && (
           <div className="modal">
             <div className="modal-content">
-              <h3>Add Schedule</h3>
+              <h3>Add Vet Schedule</h3>
               <label>Pet: </label>
               <select onChange={(e) => setSelectedPetId(e.target.value)}>
                 <option value="">Select Pet</option>
@@ -262,13 +391,99 @@ const PetSchedulePage = () => {
                 onChange={(e) => setNewSchedule({ ...newSchedule, vet_visit_time: e.target.value })}
               />
               <br />
-              <button onClick={addSchedule}>Add Schedule</button>
-              <button onClick={() => setShowModal(false)}>Cancel</button>
+              <button className="button-add" onClick={addSchedule}>Add Schedule</button>
+              <button className="delete-button" onClick={() => setShowModal(false)}>Cancel</button>
             </div>
           </div>
         )}
       </div>
-      <Footer2 />
+
+      {/* Modal for adding feeding schedule */}
+      {showFeedingModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h2>Add Feeding Schedule</h2>
+              <label>Pet: </label>
+              <select onChange={(e) => setSelectedPetId(e.target.value)}>
+                <option value="">Select Pet</option>
+                {pets.map((pet) => (
+                  <option key={pet.id} value={pet.id}>
+                    {pet.name}
+                  </option>
+                ))}
+              </select>
+              <br />
+              <label>Feeding Time:</label>
+              <input
+                type="time"
+                value={newFeedingSchedule.feeding_time}
+                onChange={(e) =>
+                  setNewFeedingSchedule({
+                    ...newFeedingSchedule,
+                    feeding_time: e.target.value,
+                  })
+                }
+              />
+              <label>Feeding Date:</label>
+              <input
+                type="date"
+                value={newFeedingSchedule.feeding_date}
+                onChange={(e) =>
+                  setNewFeedingSchedule({
+                    ...newFeedingSchedule,
+                    feeding_date: e.target.value,
+                  })
+                }
+              />
+              <button className="button-add" onClick={addFeedingSchedule}>Add Feeding Schedule</button>
+              <button className="delete-button" onClick={() => setShowFeedingModal(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {/* Modal for adding grooming schedule */}
+        {showGroomingModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h2>Add Grooming Schedule</h2>
+              <label>Pet: </label>
+              <select onChange={(e) => setSelectedPetId(e.target.value)}>
+                <option value="">Select Pet</option>
+                {pets.map((pet) => (
+                  <option key={pet.id} value={pet.id}>
+                    {pet.name}
+                  </option>
+                ))}
+              </select>
+              <br />
+              <label>Grooming Time:</label>
+              <input
+                type="time"
+                value={newGroomingSchedule.grooming_time}
+                onChange={(e) =>
+                  setNewGroomingSchedule({
+                    ...newGroomingSchedule,
+                    grooming_time: e.target.value,
+                  })
+                }
+              />
+              <label>Grooming Date:</label>
+              <input
+                type="date"
+                value={newGroomingSchedule.grooming_date}
+                onChange={(e) =>
+                  setNewGroomingSchedule({
+                    ...newGroomingSchedule,
+                    grooming_date: e.target.value,
+                  })
+                }
+              />
+              <button className="button-add" onClick={addGroomingSchedule}>Add Grooming Schedule</button>
+              <button className="delete-button" onClick={() => setShowGroomingModal(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
+    <Footer2 />
     </div>
   );
 };
