@@ -313,6 +313,7 @@ const deleteGroomingSchedule = (grooming_date) => {
 
       <div>
         {/* Selected schedules */}
+        <h2>Selected Date: {date.toDateString()}</h2>
         {selectedSchedules.length > 0 ? (
           <ul>
             {selectedSchedules.map((schedule, index) => (
