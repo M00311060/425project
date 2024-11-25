@@ -32,6 +32,15 @@ const DashboardPage = () => {
       <div className="dashboard-image-container">
         <img src={petsImage} alt="Pets" className="dashboard-image" />
       </div>
+      
+      <div className="button-description">
+          <button onClick={goToPetProfilePage} className="dashboard-button">
+            Manage Pets
+          </button>
+          <p className="button-text">
+            Add and edit your pet profiles. Keep all their important information like breed, age, and medical history organized in one place.
+          </p>
+        </div>
 
       <div className="button-container">
         <div className="button-description">
@@ -40,15 +49,6 @@ const DashboardPage = () => {
           </button>
           <p className="button-text">
             Keep track of your pet's daily routines, such as feeding, grooming, and vet visits. You can set reminders and plan ahead to make sure nothing is missed!
-          </p>
-        </div>
-
-        <div className="button-description">
-          <button onClick={goToPetProfilePage} className="dashboard-button">
-            Manage Pets
-          </button>
-          <p className="button-text">
-            Add and edit your pet profiles. Keep all their important information like breed, age, and medical history organized in one place.
           </p>
         </div>
 
