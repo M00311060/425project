@@ -33,6 +33,7 @@ const DashboardPage = () => {
         <img src={petsImage} alt="Pets" className="dashboard-image" />
       </div>
       
+      <div className="button-container">
       <div className="button-description">
           <button onClick={goToPetProfilePage} className="dashboard-button">
             Manage Pets
@@ -42,7 +43,6 @@ const DashboardPage = () => {
           </p>
         </div>
 
-      <div className="button-container">
         <div className="button-description">
           <button onClick={goToPetSchedulePage} className="dashboard-button">
             Pet Schedule
