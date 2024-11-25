@@ -22,7 +22,6 @@ const HomePage = () => {
             <li>Create and Manage Profiles for Each Pet</li>
             <li>Track Feeding, Grooming, and Vet Schedules</li>
             <li>Store Medical Records and Pet Information</li>
-            <li>Receive Notifications and Reminders</li>
             <li>Sync Schedules a Calendar</li>
           </ul>
           <p>
