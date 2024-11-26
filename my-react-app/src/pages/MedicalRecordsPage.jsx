@@ -11,11 +11,13 @@ const MedicalRecordsPage = () => {
   const [newRecord, setNewRecord] = useState({ pet_name: '', record: '' });
   const userId = JSON.parse(localStorage.getItem('user'))?.id;
 
+  // Fetch medical records
   useEffect(() => {
     if (userId) {
       axios
         .get(`/api/medical-records/user/${userId}`)
         .then((response) => {
+          // The `data` is accessed as `response.data.data`
           setMedicalRecords(response.data.data);
         })
         .catch((error) => {
@@ -68,7 +70,7 @@ const MedicalRecordsPage = () => {
 
   const handleEditSubmit = (recordId) => {
     axios
-      .put(`/api/medical-records/${recordId}`, { record: editedData.record, pet_id: editingRecord })
+      .put(`/api/medical-records/${recordId}`, { record: editedData.record })
       .then((response) => {
         setMedicalRecords((prevRecords) =>
           prevRecords.map((record) =>
