@@ -419,23 +419,17 @@ const deleteGroomingSchedule = (grooming_date) => {
                 type="time"
                 value={newFeedingSchedule.feeding_time}
                 onChange={(e) =>
-                  setNewFeedingSchedule({
-                    ...newFeedingSchedule,
-                    feeding_time: e.target.value,
-                  })
-                }
+                  setNewFeedingSchedule({...newFeedingSchedule, feeding_time: e.target.value,})}
               />
+              <br />
               <label>Feeding Date:</label>
               <input
                 type="date"
                 value={newFeedingSchedule.feeding_date}
                 onChange={(e) =>
-                  setNewFeedingSchedule({
-                    ...newFeedingSchedule,
-                    feeding_date: e.target.value,
-                  })
-                }
+                  setNewFeedingSchedule({...newFeedingSchedule, feeding_date: e.target.value,})}
               />
+              <br />              
               <button className="button-add" onClick={addFeedingSchedule}>Add Feeding Schedule</button>
               <button className="delete-button" onClick={() => setShowFeedingModal(false)}>Cancel</button>
             </div>
@@ -462,23 +456,17 @@ const deleteGroomingSchedule = (grooming_date) => {
                 type="time"
                 value={newGroomingSchedule.grooming_time}
                 onChange={(e) =>
-                  setNewGroomingSchedule({
-                    ...newGroomingSchedule,
-                    grooming_time: e.target.value,
-                  })
-                }
+                  setNewGroomingSchedule({...newGroomingSchedule, grooming_time: e.target.value,})}
               />
+              <br />
               <label>Grooming Date:</label>
               <input
                 type="date"
                 value={newGroomingSchedule.grooming_date}
                 onChange={(e) =>
-                  setNewGroomingSchedule({
-                    ...newGroomingSchedule,
-                    grooming_date: e.target.value,
-                  })
-                }
+                  setNewGroomingSchedule({...newGroomingSchedule, grooming_date: e.target.value,})}
               />
+              <br />
               <button className="button-add" onClick={addGroomingSchedule}>Add Grooming Schedule</button>
               <button className="delete-button" onClick={() => setShowGroomingModal(false)}>Cancel</button>
             </div>

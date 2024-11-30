@@ -13,6 +13,8 @@ const PetProfilesPage = () => {
     name: '',
     species: '',
     breed: '',
+    gender: '',
+    weight: '',
     feeding_schedule: '',
     medical_history: '',
     care_needs: '',
@@ -23,7 +25,9 @@ const PetProfilesPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const updatedValue = name === "weight" ? parseFloat(value) || "" : value;
+
+    setForm({ ...form, [name]: updatedValue });
   };
 
   const handleFetchPets = async () => {
@@ -44,7 +48,7 @@ const PetProfilesPage = () => {
   const handleAddOrUpdatePet = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.species || !form.breed || !form.feeding_schedule || !form.medical_history || !form.care_needs) {
+    if (!form.name || !form.species || !form.breed || !form.gender || !form.weight || !form.feeding_schedule || !form.medical_history || !form.care_needs) {
       setErrorMessage('All fields are required');
       return;
     }
@@ -89,6 +93,8 @@ const PetProfilesPage = () => {
         name: '',
         species: '',
         breed: '',
+        gender: '',
+        weight: '',
         feeding_schedule: '',
         medical_history: '',
         care_needs: '',
@@ -107,6 +113,8 @@ const PetProfilesPage = () => {
       name: pet.name,
       species: pet.species,
       breed: pet.breed,
+      gender: pet.gender,
+      weight: pet.weight,
       feeding_schedule: pet.feeding_schedule,
       medical_history: pet.medical_history,
       care_needs: pet.care_needs,
@@ -154,6 +162,14 @@ const PetProfilesPage = () => {
             <input type="text" name="breed" value={form.breed} onChange={handleInputChange} required />
           </label>
           <label>
+            Gender:
+            <input type="text" name="gender" value={form.gender} onChange={handleInputChange} required />
+          </label>
+          <label>
+            Weight lb:
+            <input type="number" name="weight" step="0.01" value={form.weight} onChange={handleInputChange} required />
+          </label>
+          <label>
             Feeding Schedule:
             <input type="text" name="feeding_schedule" value={form.feeding_schedule} onChange={handleInputChange} required />
           </label>
@@ -183,6 +199,8 @@ const PetProfilesPage = () => {
                 <h3>{pet.name}</h3>
                 <p>Species: {pet.species}</p>
                 <p>Breed: {pet.breed}</p>
+                <p>Gender: {pet.gender}</p>
+                <p>Weight lb: {pet.weight}</p>
                 <p>Feeding Schedule: {pet.feeding_schedule}</p>
                 <p>Medical History: {pet.medical_history}</p>
                 <p>Care Needs: {pet.care_needs}</p>
