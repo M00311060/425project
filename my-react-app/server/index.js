@@ -23,6 +23,10 @@ const db = new sqlite3.Database('./mydb.sqlite', (err) => {
 app.post('/api/users', (req, res) => {
   const { first_name, last_name, username, password } = req.body;
 
+  if (!first_name || !last_name || !username || !password) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
   // Hash the password
   bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
     if (err) {
@@ -40,19 +44,6 @@ app.post('/api/users', (req, res) => {
       res.status(201).json({ id: this.lastID });
     });
   });
-});
-
-// CRUD operations for Users
-app.post('/api/users', (req, res) => {
-  const { username, password, first_name, last_name } = req.body;
-  db.run(`INSERT INTO users (username, password, first_name, last_name) VALUES (?, ?, ?, ?)`,
-    [username, password, first_name, last_name], function (err) {
-      if (err) {
-        res.status(404).json({ error: err.message });
-        return;
-      }
-      res.status(201).json({ id: this.lastID });
-    });
 });
 
 app.get('/api/users', (req, res) => {
@@ -426,6 +417,8 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
     });
   });
 });
+
+//*
 
 // Function to handle adding a new feeding schedule for a specific pet
 app.post('/api/users/:userId/pets/:petId/feeding_schedule', (req, res) => {
