@@ -51,8 +51,6 @@ db.serialize(() => {
     breed TEXT,
     gender TEXT,
     weight REAL,
-    feeding_schedule TEXT,
-    medical_history TEXT,
     care_needs TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`, (err) => {
@@ -162,30 +160,30 @@ db.run(`CREATE TABLE IF NOT EXISTS grooming_schedule (
 
   // Insert data into Pets table
   const pets = [
-    [1, 'Buddy', 'Dog', 'Golden Retriever', 'Male', 30.5, 'Morning and Evening', 'None', 'Daily walks, loves to play fetch'],
-    [1, 'Max', 'Dog', 'Labrador', 'Male', 28.0, 'Twice daily', 'Arthritis', 'Short walks, soft bedding'],
-    [1, 'Bella', 'Cat', 'Maine Coon', 'Female', 4.2, 'Once daily', 'No issues', 'Weekly grooming'],
-    [1, 'Charlie', 'Parrot', 'Macaw', 'Male', 1.0, 'Twice daily', 'Feather plucking', 'Daily cage cleaning, social interaction'],
-    [1, 'Goldie', 'Fish', 'Goldfish', 'Unknown', 0.1, 'Once daily', 'No issues', 'Weekly water changes'],
-    [1, 'Spike', 'Dog', 'Bulldog', 'Male', 20.0, 'Once daily', 'Skin allergies', 'Special hypoallergenic shampoo'],
-    [2, 'Whiskers', 'Cat', 'Siamese', 'Female', 3.8, 'Twice daily', 'Allergies', 'Groom once a week'],
-    [2, 'Mittens', 'Cat', 'Persian', 'Female', 3.5, 'Once daily', 'Dental issues', 'Daily dental treats'],
-    [2, 'Rex', 'Dog', 'Beagle', 'Male', 22.0, 'Twice daily', 'None', 'Daily run, weekly grooming'],
-    [2, 'Tweety', 'Bird', 'Canary', 'Unknown', 0.2, 'Once daily', 'No issues', 'Sunlight daily'],
-    [2, 'Chirpy', 'Bird', 'Budgie', 'Female', 0.1, 'Twice daily', 'Wing injury', 'Regular vet check-ups'],
-    [2, 'Bubbles', 'Fish', 'Betta', 'Male', 0.1, 'Once daily', 'No issues', 'Weekly water changes'],
-    [3, 'Flash', 'Turtle', 'Red-Eared Slider', 'Male', 2.5, 'Twice a week', 'Shell rot', 'UVB light, shell care'],
-    [3, 'Coco', 'Dog', 'Poodle', 'Female', 12.0, 'Twice daily', 'None', 'Regular grooming, hypoallergenic shampoo'],
-    [3, 'Shadow', 'Cat', 'Black Shorthair', 'Male', 4.0, 'Twice daily', 'Anxiety', 'Calming pheromones, quiet environment'],
-    [3, 'Blaze', 'Rabbit', 'Angora', 'Female', 3.0, 'Once daily', 'None', 'Weekly brushing, nail trims'],
-    [3, 'Finn', 'Fish', 'Guppy', 'Male', 0.1, 'Once daily', 'No issues', 'Weekly water changes'],
-    [3, 'Lucky', 'Dog', 'Dachshund', 'Male', 8.0, 'Twice daily', 'Back issues', 'Avoid stairs, soft bedding']
+    [1, 'Buddy', 'Dog', 'Golden Retriever', 'Male', 30.5, 'Daily walks, loves to play fetch'],
+    [1, 'Max', 'Dog', 'Labrador', 'Male', 28.0, 'Short walks, soft bedding'],
+    [1, 'Bella', 'Cat', 'Maine Coon', 'Female', 4.2, 'Weekly grooming'],
+    [1, 'Charlie', 'Parrot', 'Macaw', 'Male', 1.0, 'Daily cage cleaning, social interaction'],
+    [1, 'Goldie', 'Fish', 'Goldfish', 'Unknown', 0.1, 'Weekly water changes'],
+    [1, 'Spike', 'Dog', 'Bulldog', 'Male', 20.0, 'Special hypoallergenic shampoo'],
+    [2, 'Whiskers', 'Cat', 'Siamese', 'Female', 3.8, 'Groom once a week'],
+    [2, 'Mittens', 'Cat', 'Persian', 'Female', 3.5, 'Daily dental treats'],
+    [2, 'Rex', 'Dog', 'Beagle', 'Male', 22.0, 'Daily run, weekly grooming'],
+    [2, 'Tweety', 'Bird', 'Canary', 'Unknown', 0.2, 'Sunlight daily'],
+    [2, 'Chirpy', 'Bird', 'Budgie', 'Female', 0.1, 'Regular vet check-ups'],
+    [2, 'Bubbles', 'Fish', 'Betta', 'Male', 0.1, 'Weekly water changes'],
+    [3, 'Flash', 'Turtle', 'Red-Eared Slider', 'Male', 2.5, 'UVB light, shell care'],
+    [3, 'Coco', 'Dog', 'Poodle', 'Female', 12.0, 'Regular grooming, hypoallergenic shampoo'],
+    [3, 'Shadow', 'Cat', 'Black Shorthair', 'Male', 4.0, 'Calming pheromones, quiet environment'],
+    [3, 'Blaze', 'Rabbit', 'Angora', 'Female', 3.0, 'Weekly brushing, nail trims'],
+    [3, 'Finn', 'Fish', 'Guppy', 'Male', 0.1, 'Weekly water changes'],
+    [3, 'Lucky', 'Dog', 'Dachshund', 'Male', 8.0, 'Avoid stairs, soft bedding']
   ];  
 
   pets.forEach(pet => {
     db.run(
-      `INSERT INTO pets (user_id, name, species, breed, gender, weight, feeding_schedule, medical_history, care_needs) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO pets (user_id, name, species, breed, gender, weight, care_needs) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       pet,
       function(err) {
         if (err) {

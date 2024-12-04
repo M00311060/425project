@@ -48,7 +48,7 @@ const PetProfilesPage = () => {
   const handleAddOrUpdatePet = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.species || !form.breed || !form.gender || !form.weight || !form.feeding_schedule || !form.medical_history || !form.care_needs) {
+    if (!form.name || !form.species || !form.breed || !form.gender || !form.weight || !form.care_needs) {
       setErrorMessage('All fields are required');
       return;
     }
@@ -95,8 +95,6 @@ const PetProfilesPage = () => {
         breed: '',
         gender: '',
         weight: '',
-        feeding_schedule: '',
-        medical_history: '',
         care_needs: '',
       });
       setEditPetId(null);
@@ -115,8 +113,6 @@ const PetProfilesPage = () => {
       breed: pet.breed,
       gender: pet.gender,
       weight: pet.weight,
-      feeding_schedule: pet.feeding_schedule,
-      medical_history: pet.medical_history,
       care_needs: pet.care_needs,
     });
     setEditPetId(pet.id);
@@ -170,14 +166,6 @@ const PetProfilesPage = () => {
             <input type="number" name="weight" step="0.01" value={form.weight} onChange={handleInputChange} required />
           </label>
           <label>
-            Feeding Schedule:
-            <input type="text" name="feeding_schedule" value={form.feeding_schedule} onChange={handleInputChange} required />
-          </label>
-          <label>
-            Medical History:
-            <input type="text" name="medical_history" value={form.medical_history} onChange={handleInputChange} required />
-          </label>
-          <label>
             Care Needs:
             <input type="text" name="care_needs" value={form.care_needs} onChange={handleInputChange} required />
           </label>
@@ -201,8 +189,6 @@ const PetProfilesPage = () => {
                 <p>Breed: {pet.breed}</p>
                 <p>Gender: {pet.gender}</p>
                 <p>Weight lb: {pet.weight}</p>
-                <p>Feeding Schedule: {pet.feeding_schedule}</p>
-                <p>Medical History: {pet.medical_history}</p>
                 <p>Care Needs: {pet.care_needs}</p>
                 <button className="edit-pet-button" onClick={() => handleEditPet(pet)}>
                   Edit Pet

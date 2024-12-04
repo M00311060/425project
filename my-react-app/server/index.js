@@ -141,7 +141,7 @@ app.get('/api/users/:userId/pets', (req, res) => {
 // Get pets with owner info
 app.get('/api/pets', (req, res) => {
   const query = `
-    SELECT pets.id, pets.name, pets.species, pets.breed, pets.gender, pets.weight, pets.feeding_schedule, pets.medical_history, pets.care_needs, 
+    SELECT pets.id, pets.name, pets.species, pets.breed, pets.gender, pets.weight, pets.care_needs, 
       users.first_name, users.last_name 
     FROM pets
     JOIN users ON pets.user_id = users.id`;
@@ -158,9 +158,9 @@ app.get('/api/pets', (req, res) => {
 
 // CRUD operations for Pets
 app.post('/api/pets', (req, res) => {
-  const { user_id, name, species, breed, gender, weight, feeding_schedule, medical_history, care_needs } = req.body;
-  db.run(`INSERT INTO pets (user_id, name, species, breed, gender, weight, feeding_schedule, medical_history, care_needs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-    [user_id, name, species, breed, gender, weight, feeding_schedule, medical_history, care_needs], function (err) {
+  const { user_id, name, species, breed, gender, weight, care_needs } = req.body;
+  db.run(`INSERT INTO pets (user_id, name, species, breed, gender, weight, care_needs) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
+    [user_id, name, species, breed, gender, weight, care_needs], function (err) {
       if (err) {
         res.status(404).json({ error: err.message });
         return;
@@ -194,9 +194,9 @@ app.get('/api/pets/:id', (req, res) => {
 // Update a pet by ID
 app.put('/api/pets/:id', (req, res) => {
   const { id } = req.params;
-  const { user_id, name, species, breed, gender, weight, feeding_schedule, medical_history, care_needs } = req.body;
-  db.run(`UPDATE pets SET user_id = ?, name = ?, species = ?, breed = ?, gender = ?, weight = ?, feeding_schedule = ?, medical_history = ?, care_needs = ? WHERE id = ?`, 
-    [user_id, name, species, breed, gender, weight, feeding_schedule, medical_history, care_needs, id], function (err) {
+  const { user_id, name, species, breed, gender, weight, care_needs } = req.body;
+  db.run(`UPDATE pets SET user_id = ?, name = ?, species = ?, breed = ?, gender = ?, weight = ?, care_needs = ? WHERE id = ?`, 
+    [user_id, name, species, breed, gender, weight, care_needs, id], function (err) {
       if (err) {
         res.status(404).json({ error: err.message });
         return;
@@ -417,8 +417,6 @@ app.post('/api/users/:userId/pets/:petId/schedules', (req, res) => {
     });
   });
 });
-
-//*
 
 // Function to handle adding a new feeding schedule for a specific pet
 app.post('/api/users/:userId/pets/:petId/feeding_schedule', (req, res) => {

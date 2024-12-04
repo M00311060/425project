@@ -100,6 +100,7 @@ const MedicalRecordsPage = () => {
             required
           />
         </label>
+        <br />
         <label>
           Record:
           <input
@@ -116,7 +117,8 @@ const MedicalRecordsPage = () => {
         <ul>
           {medicalRecords.map((record) => (
             <li key={record.record_id}>
-              <strong>Pet Name:</strong> {record.pet_name} <br />
+              <strong>Pet Name:</strong> {record.pet_name}
+              <br />
               <strong>Record:</strong>{' '}
               {editingRecord === record.record_id ? (
                 <input
